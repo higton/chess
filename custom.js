@@ -1,4 +1,4 @@
-class Pawn{
+class Piece{
     constructor(name){
         this.name = name
         this.positionY = 0
@@ -13,9 +13,6 @@ class Pawn{
         this.choices = choices
 
     }
-    empty_matrix(){
-        choices.length = 0
-    }
     insert_piece(line, column){
         this.positionX = column
         this.positionY = line
@@ -23,6 +20,33 @@ class Pawn{
             console.log('Tentou inserir o pawn numa posição não existente')
         }
     }
+
+    insert_position(line, column, board){
+        console.log('Pawn, function insert_position() called')
+        this.future_piece_side = board.table[line][column].substring(0, 4)
+        this.actual_piece_side = board.table[this.positionY][this.positionX].substring(0, 4)
+
+        this.calculate_choices(board)
+
+ 
+        if(this.choices[line][column] === 1){
+            this.positionY = line
+            this.positionX = column
+            console.log(' ')
+            return true
+        }
+        else{
+            console.log('Não foi possível mover a peça, fora do range de possibilidades')
+            return false
+        }
+    }
+    print_choices(){
+        console.log('Tabela de escolhas do ' + this.name)
+        console.table(this.choices)
+    }
+}
+class Pawn extends Piece{
+
     calculate_attack_choices(board){
         console.log('Pawn calculate_attack_choices() called')
 
@@ -81,55 +105,10 @@ class Pawn{
             }
         }
     }
-    insert_position(line, column, board){
-        console.log('Pawn, function insert_position() called')
-        this.future_piece_side = board.table[line][column].substring(0, 4)
-        this.actual_piece_side = board.table[this.positionY][this.positionX].substring(0, 4)
 
-        this.calculate_choices(board)
-
- 
-        if(this.choices[line][column] === 1){
-            this.positionY = line
-            this.positionX = column
-            console.log(' ')
-            return true
-        }
-        else{
-            console.log('Não foi possível mover a peça, fora do range de possibilidades')
-            return false
-        }
-    }
-    print_choices(){
-        console.log('Tabela de escolhas do ' + this.name)
-        console.table(this.choices)
-    }
 }
-class Rook{
-    constructor(name){
-        this.name = name
-        this.positionY = 0
-        this.positionX = 0
-        this.create_matrix()
-    }
-    create_matrix(){
-        let choices = []
-        for(let i = 0; i < 8 ; i++){
-            choices.push(new Array(8).fill(0))
-        }
-        this.choices = choices
+class Rook extends Piece{
 
-    }
-    empty_matrix(){
-        choices.length = 0
-    }
-    insert_piece(line, column){
-        this.positionX = column
-        this.positionY = line
-        if(line <= 0 || line > 7 || column <= 0 || column > 7){
-            console.log('Tentou inserir o pawn numa posição não existente')
-        }
-    }
     calculate_choices(board){
         //See wich side is the piece and save the opposite of it in tmp
         let tmp = 'ok'
@@ -139,14 +118,15 @@ class Rook{
         else{
             tmp = "DOWN";
         }
-        console.log(tmp + ' okok lolol')
+
         //Checks the right direction in axis X
-        for(let i=this.positionX+1; i <= 8; i++){
+        for(let i=this.positionX+1; i <= 7; i++){
             if(board.table[this.positionY][i] === 'aaaa'){
                 this.choices[this.positionY][i] = 1
             }
             else if(board.table[this.positionY][i].substring(0, 4) === tmp){
                 this.choices[this.positionY][i] = 1
+                break
             }
             else{
                 break
@@ -159,6 +139,7 @@ class Rook{
             }
             else if(board.table[this.positionY][i].substring(0, 4) === tmp){
                 this.choices[this.positionY][i] = 1
+                break
             }
             else{
                 break
@@ -171,6 +152,7 @@ class Rook{
             }
             else if(board.table[i][this.positionX].substring(0, 4) === tmp){
                 this.choices[i][this.positionX] = 1
+                break
             }
             else{
                 break
@@ -183,35 +165,12 @@ class Rook{
             }
             else if(board.table[i][this.positionX].substring(0, 4) === tmp){
                 this.choices[i][this.positionX] = 1
+                break
             }
             else{
                 break
             }
         }
-    }
-    insert_position(line, column, board){
-        console.log('Pawn, function insert_position() called')
-        this.future_piece_side = board.table[line][column].substring(0, 4)
-        this.actual_piece_side = board.table[this.positionY][this.positionX].substring(0, 4)
-        
-        this.calculate_choices(line, column, board)
-
-        console.table(this.choices)
-        if(this.choices[line][column] === 1){
-            this.positionY = line
-            this.positionX = column
-            console.log(' ')
-            return true
-        }
-
-        else{
-            console.log('Não foi possível mover a peça, fora do range de possibilidades')
-            return false
-        }
-    }
-    print_choices(){
-        console.log('Tabela de escolhas do ' + this.name)
-        console.table(this.choices)
     }
 }
 class Board{
@@ -257,12 +216,12 @@ class Board{
 }
 
 const board1 = new Board()
-const pawn1 = new Pawn('TOP_Pawn')
-const pawn2 = new Pawn('TOP_Pawn')
-const rook1 = new Rook('TOP_Rook')
-const enemy_rook1 = new Rook('DOWN_Rook')
-const enemy_rook2 = new Rook('DOWN_Rook')
-const enemy_pawn1 = new Pawn('DOWN_Pawn')
+const pawn1 = new Pawn('TOP_Pawn1')
+const pawn2 = new Pawn('TOP_Pawn2')
+const rook1 = new Rook('TOP_Rook1')
+const enemy_rook1 = new Rook('DOWN_Rook1')
+const enemy_rook2 = new Rook('DOWN_Rook2')
+const enemy_pawn1 = new Pawn('DOWN_Pawn1')
 //insert_position(line, column)
 board1.insert_piece(1, 1, pawn1)
 board1.insert_piece(6, 2, enemy_pawn1)
@@ -273,6 +232,7 @@ board1.insert_position(3, 1, pawn1, board1)
 board1.insert_position(4, 1, pawn1, board1)
 board1.insert_position(5, 1, pawn1, board1)
 board1.insert_piece(6, 1, enemy_rook1, board1)
+board1.insert_position(5, 2, enemy_pawn1, board1)
 
 
 pawn1.calculate_choices(board1)
