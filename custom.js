@@ -23,38 +23,37 @@ class Pawn{
             console.log('Tentou inserir o pawn numa posição não existente')
         }
     }
-    attack(line, column, board){
-        console.log('Pawn function attack() called')
-        console.log('side1 ' + this.actual_piece_side + ' side2 ' + this.future_piece_side + ' positionX ' + this.positionX + ' positionY ' + this.positionY)
-        if( (this.actual_piece_side === 'DOWN' && this.future_piece_side === 'TOP_') || (this.actual_piece_side === 'TOP_' && this.future_piece_side === 'DOWN')){
-            this.positionX = column
-            this.positionY = line
-            board.table[line][column] = this.name
-            console.log('Pawn attacked in line ' + line + ' column ' + column)
-            return true
+    calculate_attack_choices(board){
+        console.log('Pawn calculate_attack_choices() called')
+
+        let tmp = 'okok'
+        if(this.name.substring(0, 4) === 'DOWN'){
+            tmp = 'TOP_'
         }
         else{
-            return false
+            tmp = 'DOWN'
         }
-    }
-    check_attack_possibility(line, column, board){
-        console.log('Pawn check_attack_possibility() called')
-        if(1 === line - this.positionY && ( column - this.positionX === 1 || column - this.positionX === -1)){
-            console.log('Pawn wants to attack')
-            if(this.attack(line, column, board)){
-                return true
-            }
-            else{
-                return false
-            }
-        }
-    }
-    insert_position(line, column, board){
-        console.log('Pawn, function insert_position() called')
-        this.future_piece_side = board.table[line][column].substring(0, 4)
-        this.actual_piece_side = board.table[this.positionY][this.positionX].substring(0, 4)
+        console.log(tmp + ' okok lolol')
 
-        if(this.check_attack_possibility(line, column, board)) return true
+         //check if theres a enemy pawn on the diagonal right side
+        if(board.table[this.positionY - 1][this.positionX + 1].substring(0, 4) === tmp && this.name.substring(0, 4) === 'DOWN_'){
+            this.choices[this.positionY - 1][this.positionX + 1] = 1
+        }
+        if(board.table[this.positionY + 1][this.positionX + 1].substring(0, 4) === tmp && this.name.substring(0, 4) === 'TOP_'){
+            this.choices[this.positionY + 1][this.positionX + 1] = 1
+        } 
+    
+    //check if theres a enemy pawn on the diagonal left side
+        if(board.table[this.positionY - 1][this.positionX - 1].substring(0, 4) === tmp && this.name.substring(0, 4) === 'DOWN_'){
+            this.choices[this.positionY - 1][this.positionX - 1] = 1
+        }
+        if(board.table[this.positionY + 1][this.positionX - 1].substring(0, 4) === tmp && this.name.substring(0, 4) === 'TOP_'){
+            this.choices[this.positionY + 1][this.positionX - 1] = 1
+        }
+    }
+    calculate_choices(board){
+        this.calculate_attack_choices(board)
+
         if(this.actual_piece_side === 'TOP_' && this.positionY === 1){
             if(board.table[this.positionY + 1][this.positionX] === 'aaaa'){
                 this.choices[this.positionY + 1][this.positionX] = 1
@@ -81,18 +80,29 @@ class Pawn{
                 this.choices[this.positionY - 1][this.positionX] = 1
             }
         }
+    }
+    insert_position(line, column, board){
+        console.log('Pawn, function insert_position() called')
+        this.future_piece_side = board.table[line][column].substring(0, 4)
+        this.actual_piece_side = board.table[this.positionY][this.positionX].substring(0, 4)
+
+        this.calculate_choices(board)
+
+ 
         if(this.choices[line][column] === 1){
-            this.create_matrix()
             this.positionY = line
             this.positionX = column
             console.log(' ')
             return true
         }
         else{
-            this.create_matrix()
             console.log('Não foi possível mover a peça, fora do range de possibilidades')
             return false
         }
+    }
+    print_choices(){
+        console.log('Tabela de escolhas do ' + this.name)
+        console.table(this.choices)
     }
 }
 class Rook{
@@ -120,14 +130,14 @@ class Rook{
             console.log('Tentou inserir o pawn numa posição não existente')
         }
     }
-    calculate_choices(line, column, board){
+    calculate_choices(board){
         //See wich side is the piece and save the opposite of it in tmp
         let tmp = 'ok'
-        if(this.name === "DOWN"){
-             tmp = "TOP_Rook";
+        if(this.name.substring(0, 4) === "DOWN"){
+             tmp = "TOP_";
         }
         else{
-            tmp = "DOWN_Rook";
+            tmp = "DOWN";
         }
         console.log(tmp + ' okok lolol')
         //Checks the right direction in axis X
@@ -135,7 +145,7 @@ class Rook{
             if(board.table[this.positionY][i] === 'aaaa'){
                 this.choices[this.positionY][i] = 1
             }
-            else if(board.table[this.positionY][i] === tmp){
+            else if(board.table[this.positionY][i].substring(0, 4) === tmp){
                 this.choices[this.positionY][i] = 1
             }
             else{
@@ -147,7 +157,7 @@ class Rook{
             if(board.table[this.positionY][i] === 'aaaa'){
                 this.choices[this.positionY][i] = 1
             }
-            else if(board.table[this.positionY][i] === tmp){
+            else if(board.table[this.positionY][i].substring(0, 4) === tmp){
                 this.choices[this.positionY][i] = 1
             }
             else{
@@ -159,8 +169,8 @@ class Rook{
             if(board.table[i][this.positionX] === 'aaaa'){
                 this.choices[i][this.positionX] = 1
             }
-            else if(board.table[this.positionY][i] === tmp){
-                this.choices[this.positionY][i] = 1
+            else if(board.table[i][this.positionX].substring(0, 4) === tmp){
+                this.choices[i][this.positionX] = 1
             }
             else{
                 break
@@ -171,8 +181,8 @@ class Rook{
             if(board.table[i][this.positionX] === 'aaaa'){
                 this.choices[i][this.positionX] = 1
             }
-            else if(board.table[this.positionY][i] === tmp){
-                this.choices[this.positionY][i] = 1
+            else if(board.table[i][this.positionX].substring(0, 4) === tmp){
+                this.choices[i][this.positionX] = 1
             }
             else{
                 break
@@ -198,6 +208,10 @@ class Rook{
             console.log('Não foi possível mover a peça, fora do range de possibilidades')
             return false
         }
+    }
+    print_choices(){
+        console.log('Tabela de escolhas do ' + this.name)
+        console.table(this.choices)
     }
 }
 class Board{
@@ -225,6 +239,7 @@ class Board{
             this.table[tmp2][tmp] = 'aaaa'
         }
         piece.create_matrix()
+        console.log(' ')
     }
     check_position(line, column){
         if(this.table[line][column] !== 'aaaa'){
@@ -246,22 +261,23 @@ const pawn1 = new Pawn('TOP_Pawn')
 const pawn2 = new Pawn('TOP_Pawn')
 const rook1 = new Rook('TOP_Rook')
 const enemy_rook1 = new Rook('DOWN_Rook')
+const enemy_rook2 = new Rook('DOWN_Rook')
 const enemy_pawn1 = new Pawn('DOWN_Pawn')
 //insert_position(line, column)
+board1.insert_piece(1, 1, pawn1)
+board1.insert_piece(6, 2, enemy_pawn1)
 /* board1.insert_piece(1, 1, pawn1)
-board1.insert_piece(2, 1, pawn2) */
-board1.insert_piece(2, 1, rook1)
-board1.insert_piece(0, 0, enemy_rook1)
+board1.insert_piece(6, 2, enemy_pawn1) */
 
-board1.insert_position(3, 1, rook1, board1)
-board1.insert_position(3, 3, rook1, board1)
-board1.insert_position(0, 3, rook1, board1)
-board1.insert_position(0, 0, rook1, board1)
-
-console.log(' ')
+board1.insert_position(3, 1, pawn1, board1)
+board1.insert_position(4, 1, pawn1, board1)
+board1.insert_position(5, 1, pawn1, board1)
+board1.insert_piece(6, 1, enemy_rook1, board1)
 
 
-/* board1.insert_position(4, 2, enemy_pawn1, board1)
-board1.insert_position(6, 2, enemy_pawn1, board1) */
+pawn1.calculate_choices(board1)
+pawn1.print_choices()
+enemy_rook1.calculate_choices(board1)
+enemy_rook1.print_choices()
 
 board1.print_board()
