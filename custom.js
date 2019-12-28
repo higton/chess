@@ -367,7 +367,6 @@ class Queen extends Piece{
             for (let j = 0; j <= 7; j++) {
                if(this.rook.choices[i][j] === 1){
                    this.choices[i][j] = 1
-                   console.table(this.choices)
                }
             }
         }
@@ -412,9 +411,19 @@ class Board{
     print_board(){
         console.table(this.table)
     }
+    fulfil_html(){
+        var items = document.getElementsByClassName('row')
+        for (let i = 0; i <= 7; i++) {
+            for (let j = 0; j <= 7; j++) {
+               if(this.table[i][j] !== 'aaaa'){
+                   items[i].children[j].textContent = this.table[i][j]
+               }
+            }
+        }
+    }
 
 }
-
+const piece1 = new Piece()
 const board1 = new Board()
 const king1 = new King('TOP_King1')
 const pawn1 = new Pawn('TOP_Pawn1')
@@ -436,3 +445,8 @@ queen1.calculate_choices(board1)
 queen1.print_choices()
 
 board1.print_board()
+board1.fulfil_html()
+
+var items = document.getElementsByClassName('row')
+console.log(items);
+console.log(items[0].children[0]);
