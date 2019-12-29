@@ -32,7 +32,7 @@ class Piece{
     }
 
     insert_position(line, column, board){
-        console.log('Function insert_position() called')
+        console.log('Function insert_position() called line' + line + ' column ' + column)
         this.calculate_choices(board)
  
         if(this.choices[line][column] === 1){
@@ -327,88 +327,11 @@ class King extends Piece{
         }
     }
 }
-
-class Board{
-    constructor(){
-        this.deaths_quantity = 0
-        this.create_matrix()
-    }
-    create_matrix(){
-        let nothing1 = new Nothing()
-
-        let table = []
-        for(let i = 0; i < 8 ; i++){
-            table.push(new Array(8).fill(nothing1))
-        }
-        this.table = table
-    }
-
-    insert_piece(line, column, piece){
-        this.table[line][column] = piece
-        piece.insert_piece(line, column)
-    }
-    insert_position(line, column, piece){
-        let nothing1 = new Nothing()
-        let tmp = piece.positionX
-        let tmp2 = piece.positionY
-        if(piece.insert_position(line, column, this) && (tmp2 !== line || tmp !== column)){
-            this.table[line][column] = piece
-            this.table[tmp2][tmp] = nothing1
-        }
-        piece.create_matrix()
-        console.log(' ')
-    }
-    check_position(line, column){
-        if(this.table[line][column] !== 'aaaa'){
-            console.log('This position is occupied, line '+ line + ' column ' + column)
-            return true
-        }
-        else{
-            return false
-        }
-    }
-    print_board(){
-        console.table(this.table)
-    }
-    print_choices(line, column){
-        if(this.table[line][column].name !== 'nothing'){
-            this.table[line][column].calculate_choices(this)
-            this.table[line][column].print_choices()
-        }
-    }
-    print_choices_html(line, column){
-        let items = document.getElementsByClassName('row')
-        if(this.table[line][column].name !== 'nothing'){
-            this.table[line][column].calculate_choices(this)
-            for (let i = 0; i <= 7; i++) {
-                for (let j = 0; j <= 7; j++) {
-                    if(this.table[line][column].choices[i][j] === 1){
-                        items[i].children[j].style.backgroundColor = 'lightblue';
-                    }
-                }
-            }
-        }
-    }
-    fulfil_html(){
-        let items = document.getElementsByClassName('row')
-        for (let i = 0; i <= 7; i++) {
-            for (let j = 0; j <= 7; j++) {
-                if(this.table[i][j].name !== 'nothing'){
-                    let DOM_img = document.createElement('img')
-                    DOM_img.src = './images/' + this.table[i][j].side + '_' + this.table[i][j].name + '.png'
-                    items[i].children[j].appendChild(DOM_img)
-                }
-            }
-        }
-    }
-}
 class Queen extends Piece{
-    constructor(name, side){
-        super(name, side)
-        this.bishop = new Bishop('bishop', side)
-        this.rook = new Rook('rook', side)
-    }
     calculate_choices(board){
+        this.bishop = new Bishop('bishop', this.side)
+        this.rook = new Rook('rook', this.side)
+        
         this.bishop.insert_piece(this.positionY, this.positionX)
         this.rook.insert_piece(this.positionY, this.positionX)
 
@@ -431,6 +354,105 @@ class Queen extends Piece{
         }
     }
 }
+class Board{
+    constructor(){
+        this.deaths_quantity = 0
+        this.actual_object
+        this.create_matrix()
+    }
+    create_matrix(){
+        let nothing1 = new Nothing()
+
+        let table = []
+        for(let i = 0; i < 8 ; i++){
+            table.push(new Array(8).fill(nothing1))
+        }
+        this.table = table
+    }
+
+    insert_piece(line, column, piece){
+        this.table[line][column] = piece
+        piece.insert_piece(line, column)
+    }
+    insert_position(line, column, piece){
+        console.log('Functioner insert_position() called in board, line: ' + line + ' ' + column)
+        let nothing1 = new Nothing()
+        let tmp = piece.positionX
+        let tmp2 = piece.positionY
+        if(piece.insert_position(line, column, this) && (tmp2 !== line || tmp !== column)){
+            this.table[line][column] = piece
+            this.table[tmp2][tmp] = nothing1
+        }
+        console.table(this.table)
+        piece.create_matrix()
+        console.log(' ')
+    }
+    check_position(line, column){
+        if(this.table[line][column] !== 'aaaa'){
+            console.log('This position is occupied, line '+ line + ' column ' + column)
+            return true
+        }
+        else{
+            return false
+        }
+    }
+    print_board(){
+        console.table(this.table)
+    }
+    print_choices(line, column){
+        if(this.table[line][column].name !== 'nothing'){
+            this.table[line][column].calculate_choices(this)
+            this.table[line][column].print_choices()
+        }
+    }
+    print_choices_html(line, column){
+        this.fulfil_css()
+        let items = document.getElementsByClassName('row')
+        if(this.table[line][column].name !== 'nothing'){
+            this.table[line][column].calculate_choices(this)
+            for (let i = 0; i <= 7; i++) {
+                for (let j = 0; j <= 7; j++) {
+                    if(this.table[line][column].choices[i][j] === 1){
+                        items[i].children[j].style.backgroundColor = 'black';
+                    }
+                }
+            }
+            this.actual_object = this.table[line][column]
+        }
+    }
+    fulfil_css(){
+        let m = 0
+        let gameTable = document.getElementsByClassName('game-table')
+        for (let i = 0; i <= 7; i++) {
+            for (let j = 0; j <= 7; j++) {
+                m += 1
+                if(j%2 === 0 && i%2 === 0){
+                    gameTable[0].children[i].children[j].style.backgroundColor = 'darkgrey'
+                }
+                else if(j%2 === 1 && i%2 === 1){
+                    gameTable[0].children[i].children[j].style.backgroundColor = 'darkgrey'
+                }
+                else{
+                    gameTable[0].children[i].children[j].style.backgroundColor = 'white'  
+                }
+
+            }
+        }
+    }
+    print_images(){
+        let items = document.getElementsByClassName('row')
+        for (let i = 0; i <= 7; i++) {
+            for (let j = 0; j <= 7; j++) {
+                if(this.table[i][j].name !== 'nothing'){
+                    let DOM_img = document.createElement('img')
+                    DOM_img.src = './images/' + this.table[i][j].side + '_' + this.table[i][j].name + '.png'
+                    items[i].children[j].appendChild(DOM_img)
+                }
+            }
+        }
+    }
+}
+
 const piece1 = new Piece()
 const board1 = new Board()
 const king1 = new King('king', 'black')
@@ -450,8 +472,31 @@ board1.insert_piece(3, 1, rook1)
 board1.insert_piece(1, 1, pawn3)
 board1.insert_piece(2, 5, king3)
 board1.insert_piece(5, 5, queen1)
+let line, column
+let table = document.getElementsByClassName('game-table')
+console.log(table.length)
+table[0].addEventListener('click', buttonClick)
+board1.fulfil_css()
 
+//when button is clicked it ativates the possibles choices
+function buttonClick(elem){
+    console.log(line + ' ' + column)
+    elem.stopPropagation()
+    elem.preventDefault()
+    line = elem.target.parentNode.id
+    column = elem.target.id
+
+    board1.print_choices_html(line, column)
+    //if black area is clicked
+    if(board1.actual_object.choices[line][column] === 1){
+        console.log(board1.actual_object)
+        board1.insert_position(line, column, board1.actual_object)
+    }
+    console.dir(elem.target.style.backgroundColor)
+    console.log(board1.actual_object.name)
+    board1.print_board()
+    board1.print_images()
+    board1.print_choices(2, 1)
+}
 board1.print_board()
-board1.fulfil_html()
-board1.print_choices_html(5, 5)
-board1.print_choices(1, 1)
+board1.print_images()

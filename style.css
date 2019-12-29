@@ -3,7 +3,7 @@
 }
 
 .box-1 {
-  color: white;
+  color: lightgoldenrodyellow;
   background-color: black;
   width: 80%;
   text-align: center;
@@ -53,6 +53,7 @@ body{
   right: 23px;
   height: 50px;
   width: 50px;
+  pointer-events: none; /* prevents images from being clickable */
 }
 .cell text{
   position: relative;
