@@ -412,12 +412,17 @@ class Board{
         console.table(this.table)
     }
     fulfil_html(){
-        var items = document.getElementsByClassName('row')
+        let items = document.getElementsByClassName('row')
+        let DOM_img = document.createElement("img");
         for (let i = 0; i <= 7; i++) {
             for (let j = 0; j <= 7; j++) {
-               if(this.table[i][j] !== 'aaaa'){
-                   items[i].children[j].textContent = this.table[i][j]
-               }
+                if(this.table[i][j] !== 'aaaa'){
+                    
+                    if(this.table[i][j] === 'TOP_King'){
+                        DOM_img.src = "./images/black_king.png"
+                    }
+                    items[i].children[j].appendChild(DOM_img)
+                }
             }
         }
     }
@@ -425,7 +430,7 @@ class Board{
 }
 const piece1 = new Piece()
 const board1 = new Board()
-const king1 = new King('TOP_King1')
+const king1 = new King('TOP_King')
 const pawn1 = new Pawn('TOP_Pawn1')
 const pawn2 = new Pawn('TOP_Pawn2')
 const rook1 = new Rook('TOP_Rook1')
@@ -437,16 +442,8 @@ const knight1 = new Knight('TOP_Knight1')
 const bishop1 = new Bishop('TOP_Bishop1')
 
 //insert_position(line, column)
-board1.insert_piece(4, 3, queen1)
-board1.insert_piece(2, 1, enemy_rook1)
-board1.insert_position(2, 1, queen1, board1)
-
-queen1.calculate_choices(board1)
-queen1.print_choices()
+board1.insert_piece(2, 1, king1)
 
 board1.print_board()
-board1.fulfil_html()
 
-var items = document.getElementsByClassName('row')
-console.log(items);
-console.log(items[0].children[0]);
+board1.fulfil_html()

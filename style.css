@@ -44,6 +44,22 @@ body{
   padding: 40px 40px;
   border: 1px solid black;
   box-sizing: border-box;
+  white-space: nowrap;
+}
+.cell img{
+  position: relative;
+  float: left;
+  bottom: 10px;
+  right: 10px;
+  height: 30px;
+  width: 30px;
+}
+.cell text{
+  position: relative;
+  width: 100px;
+  height: 500px;
+  left: 15%;
+  bottom: 10%;
 }
 
 @media(max-width:1200px){
