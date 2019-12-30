@@ -63,6 +63,13 @@ body{
   bottom: 10%;
 }
 
+.button{
+  position: absolute;
+  width: 200px;
+  left: 40%;
+  margin-top: 1%;
+}
+
 @media(max-width:1200px){
   .cell{
     padding: 5% 5%;

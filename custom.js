@@ -26,19 +26,16 @@ class Piece{
     insert_piece(line, column){
         this.positionX = column
         this.positionY = line
-        if(line <= 0 || line > 7 || column <= 0 || column > 7){
+        if(line < 0 || line > 7 || column < 0 || column > 7){
             console.log('Tentou inserir o pawn numa posição não existente')
         }
     }
 
     insert_position(line, column, board){
-        console.log('Function insert_position() called line' + line + ' column ' + column)
         this.calculate_choices(board)
- 
         if(this.choices[line][column] === 1){
             this.positionY = line
             this.positionX = column
-            console.log(' ')
             return true
         }
         else{
@@ -123,7 +120,6 @@ class Pawn extends Piece{
 
 }
 class Rook extends Piece{
-
     calculate_choices(board){
         let opposite_side
         if(this.side === 'black'){
@@ -132,9 +128,9 @@ class Rook extends Piece{
         else{
             opposite_side = 'black';
         }
-
         //Checks the right direction in axis X
         for(let i=this.positionX+1; i <= 7; i++){
+        console.log('Passou laqui')
             if(board.table[this.positionY][i].name === 'nothing'){
                 this.choices[this.positionY][i] = 1
             }
@@ -373,19 +369,21 @@ class Board{
     insert_piece(line, column, piece){
         this.table[line][column] = piece
         piece.insert_piece(line, column)
+        this.insert_image(line, column)
     }
     insert_position(line, column, piece){
-        console.log('Functioner insert_position() called in board, line: ' + line + ' ' + column)
+        console.log('Functioner insert_position() called in board, line: ' + line + ' column ' + column + ' piece.name  ' + piece.name)
         let nothing1 = new Nothing()
-        let tmp = piece.positionX
-        let tmp2 = piece.positionY
-        if(piece.insert_position(line, column, this) && (tmp2 !== line || tmp !== column)){
+        let old_positionX = piece.positionX
+        let old_positionY = piece.positionY
+        if(piece.insert_position(line, column, this) && (old_positionY !== line || old_positionX !== column)){
             this.table[line][column] = piece
-            this.table[tmp2][tmp] = nothing1
+            this.table[old_positionY][old_positionX] = nothing1
+            this.insert_image(line, column)
+            this.remove_image(old_positionY, old_positionX)
         }
-        console.table(this.table)
         piece.create_matrix()
-        console.log(' ')
+        console.table(piece.choices)
     }
     check_position(line, column){
         if(this.table[line][column] !== 'aaaa'){
@@ -439,64 +437,123 @@ class Board{
             }
         }
     }
-    print_images(){
+    insert_image(line, column){
         let items = document.getElementsByClassName('row')
-        for (let i = 0; i <= 7; i++) {
-            for (let j = 0; j <= 7; j++) {
-                if(this.table[i][j].name !== 'nothing'){
-                    let DOM_img = document.createElement('img')
-                    DOM_img.src = './images/' + this.table[i][j].side + '_' + this.table[i][j].name + '.png'
-                    items[i].children[j].appendChild(DOM_img)
-                }
-            }
+        if(this.table[line][column].name !== 'nothing'){
+            let DOM_img = document.createElement('img')
+            DOM_img.src = './images/' + this.table[line][column].side + '_' + this.table[line][column].name + '.png'
+            items[line].children[column].appendChild(DOM_img)
         }
+        else console.log('Cant insert image in this pieces, theres no object there')
+    }
+    remove_image(line, column){
+        let items = document.getElementsByClassName('row')
+        let img = items[line].children[column].getElementsByTagName('img')
+
+        if(typeof(img[0]) === 'object'){
+            items[line].children[column].removeChild(img[0])
+        }
+        else{
+            console.log('Cant remove image')
+        }
+        this.fulfil_css()
     }
 }
+//TODO: Add turns, one way of atacking other pieces
+const board = new Board()
 
-const piece1 = new Piece()
-const board1 = new Board()
-const king1 = new King('king', 'black')
-const king2 = new King('king', 'black')
-const king3 = new King('king', 'white')
-const bishop1 = new Bishop('bishop', 'white')
-const knight1 = new Knight('knight', 'black')
-const rook1 = new Rook('rook', 'white')
-const rook3 = new Rook('rook', 'black')
-const pawn1 = new Pawn('pawn', 'white')
-const pawn3 = new Pawn('pawn', 'black')
-const queen1 = new Queen('queen', 'black')
-console.log(queen1.side + ' oioi')
-
-//insert_position(line, column)
-board1.insert_piece(3, 1, rook1)
-board1.insert_piece(1, 1, pawn3)
-board1.insert_piece(2, 5, king3)
-board1.insert_piece(5, 5, queen1)
 let line, column
-let table = document.getElementsByClassName('game-table')
-console.log(table.length)
-table[0].addEventListener('click', buttonClick)
-board1.fulfil_css()
-
-//when button is clicked it ativates the possibles choices
-function buttonClick(elem){
-    console.log(line + ' ' + column)
-    elem.stopPropagation()
+table = document.getElementsByClassName('game-table')
+table[0].addEventListener('click', boardClick)
+function boardClick(elem){
     elem.preventDefault()
-    line = elem.target.parentNode.id
-    column = elem.target.id
+    line = parseInt(elem.target.parentNode.id)
+    column = parseInt(elem.target.id)
 
-    board1.print_choices_html(line, column)
-    //if black area is clicked
-    if(board1.actual_object.choices[line][column] === 1){
-        console.log(board1.actual_object)
-        board1.insert_position(line, column, board1.actual_object)
+    board.print_choices_html(line, column)
+    if(board.actual_object.choices[line][column] === 1){
+        board.insert_position(line, column, board.actual_object)
     }
-    console.dir(elem.target.style.backgroundColor)
-    console.log(board1.actual_object.name)
-    board1.print_board()
-    board1.print_images()
-    board1.print_choices(2, 1)
 }
-board1.print_board()
-board1.print_images()
+
+
+let table = document.getElementById('start-game')
+table.addEventListener('click', buttonClick)
+function buttonClick(elem){
+    console.log('Button clicked')
+    console.log(elem)
+    start_game()
+
+}
+
+function start_game(){
+    board.fulfil_css()
+
+    const king_white = new King('king', 'white')
+    const king_black = new King('king', 'black')
+    const bishop_white1 = new Bishop('bishop', 'white')
+    const bishop_white2 = new Bishop('bishop', 'white')
+    const bishop_black1 = new Bishop('bishop', 'black')
+    const bishop_black2 = new Bishop('bishop', 'black')
+    const knight_white1 = new Knight('knight', 'white')
+    const knight_white2 = new Knight('knight', 'white')
+    const knight_black1 = new Knight('knight', 'black')
+    const knight_black2 = new Knight('knight', 'black')
+    const rook_white1 = new Rook('rook', 'white')
+    const rook_white2 = new Rook('rook', 'white')
+    const rook_black1 = new Rook('rook', 'black')
+    const rook_black2 = new Rook('rook', 'black')
+    const pawn_white1 = new Pawn('pawn', 'white')
+    const pawn_white2 = new Pawn('pawn', 'white')
+    const pawn_white3 = new Pawn('pawn', 'white')
+    const pawn_white4 = new Pawn('pawn', 'white')
+    const pawn_white5 = new Pawn('pawn', 'white')
+    const pawn_white6 = new Pawn('pawn', 'white')
+    const pawn_white7 = new Pawn('pawn', 'white')    
+    const pawn_white8 = new Pawn('pawn', 'white')
+    const pawn_black1 = new Pawn('pawn', 'black')
+    const pawn_black2 = new Pawn('pawn', 'black')
+    const pawn_black3 = new Pawn('pawn', 'black')
+    const pawn_black4 = new Pawn('pawn', 'black')
+    const pawn_black5 = new Pawn('pawn', 'black')
+    const pawn_black6 = new Pawn('pawn', 'black')
+    const pawn_black7 = new Pawn('pawn', 'black')    
+    const pawn_black8 = new Pawn('pawn', 'black')
+
+    const queen_white = new Queen('queen', 'white')
+    const queen_black = new Queen('queen', 'black')
+
+    board.insert_piece(7, 4, king_white)
+    board.insert_piece(0, 4, king_black)
+    board.insert_piece(7, 2, bishop_white1)
+    board.insert_piece(7, 5, bishop_white2)
+    board.insert_piece(0, 2, bishop_black1)
+    board.insert_piece(0, 5, bishop_black2)
+    board.insert_piece(7, 1, knight_white1)
+    board.insert_piece(7, 6, knight_white2)
+    board.insert_piece(0, 1, knight_black1)
+    board.insert_piece(0, 6, knight_black2)
+    board.insert_piece(7, 0, rook_white1)
+    board.insert_piece(7, 7, rook_white2)
+    board.insert_piece(0, 0, rook_black1)
+    board.insert_piece(0, 7, rook_black2)
+    board.insert_piece(1, 0, pawn_black1)
+    board.insert_piece(1, 1, pawn_black2)
+    board.insert_piece(1, 2, pawn_black3)
+    board.insert_piece(1, 3, pawn_black4)
+    board.insert_piece(1, 4, pawn_black5)
+    board.insert_piece(1, 5, pawn_black6)
+    board.insert_piece(1, 6, pawn_black7)
+    board.insert_piece(1, 7, pawn_black8)
+    board.insert_piece(6, 0, pawn_white1)
+    board.insert_piece(6, 1, pawn_white2)
+    board.insert_piece(6, 2, pawn_white3)
+    board.insert_piece(6, 3, pawn_white4)
+    board.insert_piece(6, 4, pawn_white5)
+    board.insert_piece(6, 5, pawn_white6)
+    board.insert_piece(6, 6, pawn_white7)
+    board.insert_piece(6, 7, pawn_white8)
+    board.insert_piece(7, 3, queen_white)
+    board.insert_piece(0, 3, queen_black)
+    
+}
