@@ -2,7 +2,6 @@ class Piece{
     constructor(name, side){
         this.side = side
 
-        let tmp
         if(this.side === 'black'){
              this.other_side = 'white';
         }
@@ -13,15 +12,6 @@ class Piece{
         this.name = name
         this.positionY = 0
         this.positionX = 0
-        this.create_matrix()
-    }
-    create_matrix(){
-        let choices = []
-        for(let i = 0; i < 8 ; i++){
-            choices.push(new Array(8).fill(0))
-        }
-        this.choices = choices
-
     }
     insert_piece(line, column){
         this.positionX = column
@@ -32,8 +22,7 @@ class Piece{
     }
 
     insert_position(line, column, board){
-        this.calculate_choices(board)
-        if(this.choices[line][column] === 1){
+        if(board.choices[line][column] === 1){
             this.positionY = line
             this.positionX = column
             return true
@@ -42,10 +31,6 @@ class Piece{
             console.log('Não foi possível mover a peça, fora do range de possibilidades')
             return false
         }
-    }
-    print_choices(){
-        console.log('Tabela de escolhas do ' + this.name)
-        console.table(this.choices)
     }
 }
 class Nothing{
@@ -56,31 +41,44 @@ class Nothing{
 }
 class Pawn extends Piece{
 
+    calculate_future_attack(board){      //fill the diagonals with 1s
+        if(this.positionY - 1 >= 0 && this.positionX + 1 <= 7 && this.side === 'white'){
+                board.choices[this.positionY - 1][this.positionX + 1] = 1
+        }
+        if(this.positionY + 1 <= 7 && this.positionX + 1 <= 7 && this.side === 'black'){
+                board.choices[this.positionY + 1][this.positionX + 1] = 1
+        }
+        if(this.positionY - 1 >= 0 && this.positionX - 1 >= 0 && this.side === 'white'){
+                board.choices[this.positionY - 1][this.positionX - 1] = 1
+        }
+        if(this.positionY + 1 <= 7 && this.positionX - 1 >= 0 && this.side === 'black'){
+                board.choices[this.positionY + 1][this.positionX - 1] = 1
+        }
+    }
     calculate_attack_choices(board){
-        console.log('Pawn calculate_attack_choices() called')
 
         let opposite_side = this.other_side
 
         //check if theres a enemy pawn on the diagonal right side
         if(this.positionY - 1 >= 0 && this.positionX + 1 <= 7){
             if(board.table[this.positionY - 1][this.positionX + 1].side === this.other_side && this.side === 'white'){
-                this.choices[this.positionY - 1][this.positionX + 1] = 1
+                board.choices[this.positionY - 1][this.positionX + 1] = 1
             }
         }
         if(this.positionY + 1 <= 7 && this.positionX + 1 <= 7){
             if(board.table[this.positionY + 1][this.positionX + 1].side === this.other_side && this.side === 'black'){
-                this.choices[this.positionY + 1][this.positionX + 1] = 1
+                board.choices[this.positionY + 1][this.positionX + 1] = 1
             } 
         }
         //check if theres a enemy pawn on the diagonal left side
         if(this.positionY - 1 >= 0 && this.positionX - 1 >= 0){
             if(board.table[this.positionY - 1][this.positionX - 1].side === this.other_side && this.side === 'white'){
-                this.choices[this.positionY - 1][this.positionX - 1] = 1
+                board.choices[this.positionY - 1][this.positionX - 1] = 1
             }
         }
         if(this.positionY + 1 <= 7 && this.positionX - 1 >= 0){
             if(board.table[this.positionY + 1][this.positionX - 1].side === this.other_side && this.side === 'black'){
-                this.choices[this.positionY + 1][this.positionX - 1] = 1
+                board.choices[this.positionY + 1][this.positionX - 1] = 1
             }
         }
     }
@@ -89,29 +87,29 @@ class Pawn extends Piece{
 
         if(this.side === 'black' && this.positionY === 1){
             if(board.table[this.positionY + 1][this.positionX].name === 'nothing'){
-                this.choices[this.positionY + 1][this.positionX] = 1
+                board.choices[this.positionY + 1][this.positionX] = 1
                 if(board.table[this.positionY + 2][this.positionX].name === 'nothing'){
-                    this.choices[this.positionY + 2][this.positionX] = 1
+                    board.choices[this.positionY + 2][this.positionX] = 1
                 }
             }
         }
         if(this.side === 'white' && this.positionY === 6){
             if(board.table[this.positionY - 1][this.positionX].name === 'nothing'){
-                this.choices[this.positionY - 1][this.positionX] = 1
+                board.choices[this.positionY - 1][this.positionX] = 1
                 if(board.table[this.positionY - 2][this.positionX].name === 'nothing'){
-                    this.choices[this.positionY - 2][this.positionX] = 1
+                    board.choices[this.positionY - 2][this.positionX] = 1
                 }
             }
         }
         else if(this.side === 'black'){
             if(board.table[this.positionY + 1][this.positionX].name === 'nothing'){
-                this.choices[this.positionY + 1][this.positionX] = 1
+                board.choices[this.positionY + 1][this.positionX] = 1
             }
         }
         
         else if(this.side === 'white'){
             if(board.table[this.positionY -1][this.positionX].name === 'nothing'){
-                this.choices[this.positionY - 1][this.positionX] = 1
+                board.choices[this.positionY - 1][this.positionX] = 1
             }
         }
 
@@ -130,12 +128,11 @@ class Rook extends Piece{
         }
         //Checks the right direction in axis X
         for(let i=this.positionX+1; i <= 7; i++){
-        console.log('Passou laqui')
             if(board.table[this.positionY][i].name === 'nothing'){
-                this.choices[this.positionY][i] = 1
+                board.choices[this.positionY][i] = 1
             }
             else if(board.table[this.positionY][i].side === opposite_side){
-                this.choices[this.positionY][i] = 1
+                board.choices[this.positionY][i] = 1
                 break
             }
             else{
@@ -145,10 +142,10 @@ class Rook extends Piece{
         //Checks the left direction in axis X
         for(let i=this.positionX-1; i >= 0; i--){
             if(board.table[this.positionY][i].name === 'nothing'){
-                this.choices[this.positionY][i] = 1
+                board.choices[this.positionY][i] = 1
             }
             else if(board.table[this.positionY][i].side === opposite_side){
-                this.choices[this.positionY][i] = 1
+                board.choices[this.positionY][i] = 1
                 break
             }
             else{
@@ -158,10 +155,10 @@ class Rook extends Piece{
         //Checks the upwards direction in axis Y
         for(let i=this.positionY-1; i >=0 ; i--){
             if(board.table[i][this.positionX].name === 'nothing'){
-                this.choices[i][this.positionX] = 1
+                board.choices[i][this.positionX] = 1
             }
             else if(board.table[i][this.positionX].side === opposite_side){
-                this.choices[i][this.positionX] = 1
+                board.choices[i][this.positionX] = 1
                 break
             }
             else{
@@ -171,10 +168,10 @@ class Rook extends Piece{
         //Checks the downwards direction in axis Y
         for(let i=this.positionY+1; i <= 7; i++){
             if(board.table[i][this.positionX].name === 'nothing'){
-                this.choices[i][this.positionX] = 1
+                board.choices[i][this.positionX] = 1
             }
             else if(board.table[i][this.positionX].side === opposite_side){
-                this.choices[i][this.positionX] = 1
+                board.choices[i][this.positionX] = 1
                 break
             }
             else{
@@ -186,45 +183,45 @@ class Rook extends Piece{
 class Knight extends Piece{
     calculate_choices(board){
         //right side
-        if(this.positionY + 1 <= 7 && this.positionX + 1 <= 7){
+        if(this.positionY + 1 <= 7 && this.positionX + 2 <= 7){
             if(board.table[this.positionY + 1][ this.positionX + 2].side !== this.side){
-                this.choices[this.positionY + 1][this.positionX + 2] = 1
+                board.choices[this.positionY + 1][this.positionX + 2] = 1
             }
         }
         if(this.positionY - 1 >= 0 && this.positionX + 2 <= 7){
             if(board.table[this.positionY - 1][ this.positionX + 2].side !== this.side){
-                this.choices[this.positionY - 1][ this.positionX + 2] = 1
+                board.choices[this.positionY - 1][ this.positionX + 2] = 1
             }
         }
         if(this.positionY + 2 <= 7 && this.positionX + 1 <= 7){
             if(board.table[this.positionY + 2][ this.positionX + 1].side !== this.side){
-                this.choices[this.positionY + 2][this.positionX + 1] = 1
+                board.choices[this.positionY + 2][this.positionX + 1] = 1
             }
         }
         if(this.positionY - 2 >= 0 && this.positionX + 1 <= 7){
             if(board.table[this.positionY - 2][ this.positionX + 1].side !== this.side){
-                this.choices[this.positionY - 2][this.positionX + 1] = 1
+                board.choices[this.positionY - 2][this.positionX + 1] = 1
             }
         }
         //left side
         if(this.positionY + 1 <= 7 && this.positionX - 2 >= 0){
             if(board.table[this.positionY + 1][ this.positionX - 2].side !== this.side){
-                this.choices[this.positionY + 1][this.positionX - 2] = 1
+                board.choices[this.positionY + 1][this.positionX - 2] = 1
             }
         }
         if(this.positionY - 1 >= 0 && this.positionX - 2 >= 0){
             if(board.table[this.positionY - 1][ this.positionX - 2].side !== this.side){
-                this.choices[this.positionY - 1][this.positionX - 2] = 1
+                board.choices[this.positionY - 1][this.positionX - 2] = 1
             }
         }
         if(this.positionY + 2 <= 7 && this.positionX - 1 >= 0){
             if(board.table[this.positionY + 2][ this.positionX - 1].side !== this.side){
-                this.choices[this.positionY + 2][this.positionX - 1] = 1
+                board.choices[this.positionY + 2][this.positionX - 1] = 1
             }
         }
         if(this.positionY - 2 >= 0 && this.positionX - 1 >= 0){
             if(board.table[this.positionY - 2][ this.positionX - 1].side !== this.side){
-                this.choices[this.positionY - 2][this.positionX - 1] = 1
+                board.choices[this.positionY - 2][this.positionX - 1] = 1
             }
         }
     }
@@ -232,12 +229,12 @@ class Knight extends Piece{
 class Bishop extends Piece{
     set_choices(board, line, column){
         if(board.table[line][column].name === 'nothing'){
-            this.choices[line][column] = 1
+            board.choices[line][column] = 1
             return false
         }
         //if finds enemy
         else if(board.table[this.positionY][this.positionX].other_side === board.table[line][column].side){
-            this.choices[line][column] = 1
+            board.choices[line][column] = 1
             return true
         }
         else return true
@@ -278,47 +275,63 @@ class King extends Piece{
         let tmp = this.side
 
         //right side
-        if(this.positionY && this.positionX + 1 <= 7){
+        if(this.positionY <= 7 && this.positionX + 1 <= 7){
             if(board.table[this.positionY][ this.positionX + 1].side !== this.side){
-                this.choices[this.positionY][this.positionX + 1] = 1
+                if(board.enemy_choices[this.positionY][ this.positionX + 1] !== 1){
+                    board.choices[this.positionY][this.positionX + 1] = 1
+                }
             }
         }
         if(this.positionY - 1 >= 0 && this.positionX + 1 <= 7){
             if(board.table[this.positionY - 1][ this.positionX + 1].side !== this.side){
-                this.choices[this.positionY - 1][this.positionX + 1] = 1
+                if(board.enemy_choices[this.positionY - 1][ this.positionX + 1] !== 1){
+                    board.choices[this.positionY - 1][this.positionX + 1] = 1
+                }            
             }
         }
         if(this.positionY + 1 <= 7 && this.positionX + 1 <= 7){
             if(board.table[this.positionY + 1][ this.positionX + 1].side !== this.side){
-                this.choices[this.positionY + 1][this.positionX + 1] = 1
+                if(board.enemy_choices[this.positionY + 1][ this.positionX + 1] !== 1){
+                    board.choices[this.positionY + 1][this.positionX + 1] = 1
+                }            
             }
         }
         //upwards side
         if(this.positionY - 1 >= 0 && this.positionX){
             if(board.table[this.positionY - 1][ this.positionX].side !== this.side){
-                this.choices[this.positionY - 1][this.positionX] = 1
+                if(board.enemy_choices[this.positionY - 1][ this.positionX] !== 1){
+                    board.choices[this.positionY - 1][this.positionX] = 1
+                }            
             }
         }
         //downwards side
         if(this.positionY + 1 <= 7 && this.positionX){
             if(board.table[this.positionY + 1][ this.positionX ].side !== this.side){
-                this.choices[this.positionY + 1][this.positionX ] = 1
+                if(board.enemy_choices[this.positionY + 1][ this.positionX] !== 1){
+                    board.choices[this.positionY + 1][this.positionX] = 1
+                }            
             }
         }
         //left side
-        if(this.positionY && this.positionX - 1 >= 0){
+        if(this.positionY <= 7 && this.positionX - 1 >= 0){
             if(board.table[this.positionY][ this.positionX - 1].side !== this.side){
-                this.choices[this.positionY][this.positionX - 1] = 1
+                if(board.enemy_choices[this.positionY][ this.positionX - 1] !== 1){
+                    board.choices[this.positionY][this.positionX - 1] = 1
+                }            
             }
         }
         if(this.positionY - 1 >= 0 && this.positionX - 1 >= 0){
             if(board.table[this.positionY - 1][ this.positionX - 1].side !== this.side){
-                this.choices[this.positionY - 1][this.positionX - 1] = 1
+                if(board.enemy_choices[this.positionY - 1][ this.positionX - 1] !== 1){
+                    board.choices[this.positionY - 1][this.positionX - 1] = 1
+                }
             }
         }
         if(this.positionY + 1 <= 7 && this.positionX - 1 >= 0){
             if(board.table[this.positionY + 1][ this.positionX - 1].side !== this.side){
-                this.choices[this.positionY + 1][this.positionX - 1] = 1
+                if(board.enemy_choices[this.positionY + 1][ this.positionX - 1] !== 1){
+                    board.choices[this.positionY + 1][this.positionX - 1] = 1
+                }
             }
         }
     }
@@ -332,36 +345,37 @@ class Queen extends Piece{
         this.rook.insert_piece(this.positionY, this.positionX)
 
         this.bishop.calculate_choices(board)
-        this.choices = this.bishop.choices
         this.rook.calculate_choices(board)
-        this.merge_matrices()
-
-        //fill matrices with zeros again
-        this.bishop.create_matrix()
-        this.rook.create_matrix()
-    }
-    merge_matrices(){
-        for (let i = 0; i <= 7; i++) {
-            for (let j = 0; j <= 7; j++) {
-               if(this.rook.choices[i][j] === 1){
-                   this.choices[i][j] = 1
-               }
-            }
-        }
     }
 }
 class Board{
     constructor(){
-        this.deaths_quantity = 0
-        this.actual_object
-        this.create_matrix()
-    }
-    create_matrix(){
-        let nothing1 = new Nothing()
+        let nothing = new Nothing()
+        this.obj_nothing = nothing
 
+        this.white_side_points = 0
+        this.black_side_points = 0
+        this.white_pieces_dead = []
+        this.black_pieces_dead = []
+        this.number_black_pieces_dead = 0
+        this.number_white_pieces_dead = 0
+        this.actual_object
+        this.create_matrix_table()
+        this.create_matrix_choices()
+        this.enemy_choices = this.choices
+    }
+    create_matrix_choices(){
+        let choices = []
+        for(let i = 0; i < 8 ; i++){
+            choices.push(new Array(8).fill(0))
+        }
+        this.choices = choices
+    }
+    
+    create_matrix_table(){
         let table = []
         for(let i = 0; i < 8 ; i++){
-            table.push(new Array(8).fill(nothing1))
+            table.push(new Array(8).fill(this.obj_nothing))
         }
         this.table = table
     }
@@ -373,25 +387,68 @@ class Board{
     }
     insert_position(line, column, piece){
         console.log('Functioner insert_position() called in board, line: ' + line + ' column ' + column + ' piece.name  ' + piece.name)
-        let nothing1 = new Nothing()
+        this.create_matrix_choices()
+
         let old_positionX = piece.positionX
         let old_positionY = piece.positionY
+        
+        this.calculate_choices(old_positionY, old_positionX, piece)
+
+        console.log('Tabela CHOICES, de ' + this.table[line][column].name)
+        console.table(this.choices)
+
         if(piece.insert_position(line, column, this) && (old_positionY !== line || old_positionX !== column)){
-            this.table[line][column] = piece
-            this.table[old_positionY][old_positionX] = nothing1
-            this.insert_image(line, column)
+            //remove images from the past and actual positions
+            if( this.remove_image(line, column) ) this.add_death_score(this.table[line][column]) 
             this.remove_image(old_positionY, old_positionX)
+
+            //replace objects
+            this.table[line][column] = piece
+            this.table[old_positionY][old_positionX] = this.obj_nothing
+
+            //insert image in the actual position
+            this.insert_image(line, column)
         }
-        piece.create_matrix()
-        console.table(piece.choices)
+        this.create_matrix_choices()
+
     }
-    check_position(line, column){
-        if(this.table[line][column] !== 'aaaa'){
-            console.log('This position is occupied, line '+ line + ' column ' + column)
-            return true
+    calculate_choices(line, column, piece){
+        console.log(line + ' ' + column)
+        console.table(piece)
+        //calculate choices that will seee if the king can move
+        if(piece.name === 'king'){
+            this.table[line][column] = this.obj_nothing
+            this.calculate_enemy_side_choices(piece)
+            this.table[line][column] = piece
         }
-        else{
-            return false
+        piece.calculate_choices(this)
+        console.table(this.choices)
+    }
+    calculate_enemy_side_choices(king_obj){
+        //create a loop and calculate the choices in each piece
+        for (let i = 0; i <= 7; i++) {
+            for (let j = 0; j <= 7; j++) {
+                if(this.table[i][j].side === king_obj.other_side){
+                    if(this.table[i][j].name !== 'pawn'){
+                        this.table[i][j].calculate_choices(this)
+                    }
+                    if(this.table[i][j].name === 'pawn'){
+                        this.table[i][j].calculate_future_attack(this)
+                    }
+                }
+            }
+        }
+        this.enemy_choices = this.choices
+        this.create_matrix_choices()
+    }
+    add_death_score(piece){
+        if(piece.side === 'white'){
+            this.white_pieces_dead[this.number_white_pieces_dead] = piece
+            this.number_white_pieces_dead += 1
+        }
+        else if(piece.side === 'black'){
+            this.black_pieces_dead[this.number_black_pieces_dead] = piece
+            this.number_black_pieces_dead += 1
         }
     }
     print_board(){
@@ -400,22 +457,23 @@ class Board{
     print_choices(line, column){
         if(this.table[line][column].name !== 'nothing'){
             this.table[line][column].calculate_choices(this)
-            this.table[line][column].print_choices()
+            this.print_choices()
         }
     }
     print_choices_html(line, column){
+        this.create_matrix_choices()
         this.fulfil_css()
+
         let items = document.getElementsByClassName('row')
         if(this.table[line][column].name !== 'nothing'){
-            this.table[line][column].calculate_choices(this)
+            this.calculate_choices(line, column, this.table[line][column])
             for (let i = 0; i <= 7; i++) {
                 for (let j = 0; j <= 7; j++) {
-                    if(this.table[line][column].choices[i][j] === 1){
+                    if(this.choices[i][j] === 1){
                         items[i].children[j].style.backgroundColor = 'black';
                     }
                 }
             }
-            this.actual_object = this.table[line][column]
         }
     }
     fulfil_css(){
@@ -439,6 +497,7 @@ class Board{
     }
     insert_image(line, column){
         let items = document.getElementsByClassName('row')
+
         if(this.table[line][column].name !== 'nothing'){
             let DOM_img = document.createElement('img')
             DOM_img.src = './images/' + this.table[line][column].side + '_' + this.table[line][column].name + '.png'
@@ -452,36 +511,85 @@ class Board{
 
         if(typeof(img[0]) === 'object'){
             items[line].children[column].removeChild(img[0])
+            this.fulfil_css()
+            return true
         }
         else{
             console.log('Cant remove image')
+            return false
         }
-        this.fulfil_css()
+    }
+    print_choices(){
+        console.log('Tabela de escolhas do ' + this.name)
+        console.table(this.choices)
     }
 }
-//TODO: Add turns, one way of atacking other pieces
+class Turn{
+    constructor(){
+        this.side = 'white'
+    }
+    changeTurn(){
+        console.log('Changed the turn, now is ' + this.side + ' turn')
+        if(this.side === 'white')  this.side = 'black'
+        else if(this.side === 'black') this.side = 'white'
+    }
+}
+
+//TODO: 
+//     if the king can't move, check mate!
+//     if clicked again in start game, the game should reset
+//     if clicked again in the piece, will not show the possibilities
+//     show the dead pieces on the side
+
+//     create more classes
+//     refactor the if conditions to be more pure
+//     refactor the class pawn
+
 const board = new Board()
+const turn = new Turn()
 
 let line, column
-table = document.getElementsByClassName('game-table')
+let table = document.getElementsByClassName('game-table')
+var score = document.getElementsByClassName('game-score');
+
 table[0].addEventListener('click', boardClick)
+
 function boardClick(elem){
     elem.preventDefault()
     line = parseInt(elem.target.parentNode.id)
     column = parseInt(elem.target.id)
 
-    board.print_choices_html(line, column)
-    if(board.actual_object.choices[line][column] === 1){
-        board.insert_position(line, column, board.actual_object)
-    }
+    check_turn_side()
+    check_position()
+    print_pieces_dead_html()
+
 }
 
+function check_turn_side(){
+    if(turn.side === board.table[line][column].side){
+        board.print_choices_html(line, column)
+        if(board.table[line][column].name !== 'nothing'){
+            board.actual_object = board.table[line][column]
+        }
+    }
+}
+function check_position(){
+    if(board.choices[line][column] === 1){
+        board.insert_position(line, column, board.actual_object)
+        turn.changeTurn()
+    }
+}
+function print_pieces_dead_html(){
+    var paragraph = document.getElementById('p1')
+    paragraph.textContent = board.white_pieces_dead.length
+    var paragraph = document.getElementById('p2')
+    paragraph.textContent = board.black_pieces_dead.length
+}
 
-let table = document.getElementById('start-game')
-table.addEventListener('click', buttonClick)
+let start = document.getElementById('start-game')
+start.addEventListener('click', buttonClick)
 function buttonClick(elem){
     console.log('Button clicked')
-    console.log(elem)
     start_game()
 
 }

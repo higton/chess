@@ -17,7 +17,8 @@
 .container{
   border: 3px double yellow;
   padding: 1%;
-  margin: 0% 10% 10%;
+  height: 80%;
+  margin: 0% 10%;
   }
 body{
   background-color: white;
@@ -33,7 +34,7 @@ body{
   box-sizing: border-box;
 }
 .cell{
-  font-size: 1vw;
+  font-size: 1vh;
   height: 10px;
   width: 10px;
   position: relative;
@@ -66,8 +67,25 @@ body{
 .button{
   position: absolute;
   width: 200px;
+  height: 5vh;
   left: 40%;
-  margin-top: 1%;
+}
+
+.container-score{
+  border: 1px solid black;
+  height: 8vh;
+  width: 100%;
+}
+
+.game-score{
+  float: left;
+  border: 1px solid black;
+  margin-top: 0;
+  margin-left: 15vw;
+  height: 12vh;
+  padding-left: 4%;
+  padding-right: 0;
+  width: 18vh;
 }
 
 @media(max-width:1200px){
