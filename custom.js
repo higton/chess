@@ -2,6 +2,7 @@
 class Board{
     constructor(){
         this.turn = new Turn()
+        this.dom = new DOM()
         this.obj_nothing = new Nothing()
 
         this.white_side_points = 0
@@ -104,41 +105,37 @@ class Board{
     insert_piece(line, column, piece){
         this.table[line][column] = piece
         piece.insert_piece(line, column)
-        this.insert_image(line, column)        
+        this.dom.insert_image(line, column, this)        
     }
+
     insert_position(line, column, piece){
         console.log('Functioner insert_position() called in board, line: ' + line + ' column ' + column + ' piece.name  ' + piece.name)
 
         this.old_positionX = piece.positionX
         this.old_positionY = piece.positionY
+        this.actual_object = piece
 
-        this.calculate_choices(this.old_positionY, this.old_positionX, piece)
         if(piece.insert_position(line, column, this)){
-            console.log('passou por aqui')
-
             //remove images from the actual position
-            if( this.remove_image(line, column) ){
+            if( this.dom.remove_image(line, column) ){
                 this.old_object = this.table[line][column]
                 this.add_death_score(this.table[line][column])
             }
             //remove images from the past
-            this.remove_image(this.old_positionY, this.old_positionX)
+            this.dom.remove_image(this.old_positionY, this.old_positionX)
 
             //replace objects
             this.table[this.old_positionY][this.old_positionX] = this.obj_nothing
             this.table[line][column] = piece
 
             //insert image in the actual position
-            this.insert_image(line, column)
+            this.dom.insert_image(line, column, this)
         }
 
         this.create_matrix_choices()
-        
-        // for each piece moved, will check if the king
-        // is in check
-        this.calculate_check_probability(line, column, piece)
     }
     calculate_choices(line, column, piece){
+        console.log('Function calculate_choices called')
         //calculate choices that will see if the king can move
         if(piece.name === 'king'){
             this.table[line][column] = this.obj_nothing
@@ -150,53 +147,74 @@ class Board{
         //if king is in check, will enter in each elem from the matrix choices
         //if choices[i][j] === 1, check if this movement will help release king
         //if can't release king from check, then choices[i][j] = 0
-/*         if( (this.white_king_in_check === false && piece.side === 'white') 
-        || (this.black_king_in_check === false && piece.side === 'black') ){
+
+         if(this.white_king_in_check === true && this.turn.side === 'white'){
             this.calculate_possibility_release_king_from_check(piece)     
-        } */
+        }
+        else if(this.black_king_in_check === true && this.turn.side === 'black'){
+            this.calculate_possibility_release_king_from_check(piece)     
+        }
     }
     undo(){
-        console.table(this.old_object)
         this.choices[this.old_positionY][this.old_positionX] = 1
-
         this.insert_position(this.old_positionY, this.old_positionX, this.actual_object)
+        this.choices[this.old_positionY][this.old_positionX] = 0
 
-        console.log(typeof(this.old_object))
         if(typeof(this.old_object) === 'object'){
             this.choices[this.old_object.positionY][this.old_object.positionX] = 1
             this.insert_position(this.old_object.positionY, this.old_object.positionX, this.old_object)
+            this.choices[this.old_object.positionY][this.old_object.positionX] = 1
         }
-        this.turn.changeTurn()
+
     }
     calculate_possibility_release_king_from_check(piece){
+        console.log('Function calculate_possibility_release_king_from_check() was called')
+        let tmp = this.choices
         for (let i = 0; i <= 7; i++) {
             for (let j = 0; j <= 7; j++) {
-                if(this.table[i][j].side === this.turn.side){
-                    if(this.choices[i][j] === 1){
-                        this.insert_position(i, j, piece)
-                        this.undo
+                if(tmp[i][j] === 1){
+                    this.choices = tmp
+                    this.insert_position(i, j, piece)
+                    if(this.calculate_check_probability()){
+                        tmp[i][j] = 0
                     }
+                    this.undo()
                 }
+            }
         }
+        this.choices = tmp
     }
-    }
-    calculate_check_probability(line, column, piece){
-        this.calculate_choices(line, column, piece)
+    //return true if the king is in check
+    calculate_check_probability(){
+        console.log('Function calculate_check_probability() called')
+        if(this.turn.side === 'black'){
+            this.calculate_enemy_side_choices(this.king_black)
+        }
+        if(this.turn.side === 'white'){
+            this.calculate_enemy_side_choices(this.king_white)
+        }
 
-        if(this.choices[this.king_white.positionY][this.king_white.positionX] === 1){
+        if(this.enemy_choices[this.king_white.positionY][this.king_white.positionX] === 1 && this.turn.side === 'white'){
             console.log('okidoki')
             this.create_matrix_choices()
-            this.DOM_change_background('red')
+            this.dom.change_background('red')
             this.white_king_in_check = true
+            return true
         }
-        else if(this.choices[this.king_black.positionY][this.king_black.positionX] === 1){
+        else if(this.enemy_choices[this.king_black.positionY][this.king_black.positionX] === 1 && this.turn.side === 'black'){
+            console.log('okidoki')
             this.create_matrix_choices()
-            this.DOM_change_background('darkred')
+            this.dom.change_background('darkred')
             this.black_king_in_check = true
+            return true
         }
         else{
-            this.DOM_change_background('white')
+            this.dom.change_background('white')
             this.create_matrix_choices()
+            this.black_king_in_check = false
+            this.white_king_in_check = false
+
+            return false
         }
     }
     calculate_enemy_side_choices(king_obj){
@@ -226,84 +244,22 @@ class Board{
             this.number_black_pieces_dead += 1
         }
     }
-    print_board(){
-        console.table(this.table)
-    }
-    print_choices(line, column){
-        if(this.table[line][column].name !== 'nothing'){
-            this.table[line][column].calculate_choices(this)
-            this.print_choices()
-        }
-    }
-    print_choices_html(line, column){
-        this.create_matrix_choices()
-        this.fulfil_css()
 
-        let items = document.getElementsByClassName('row')
-        if(this.table[line][column].name !== 'nothing'){
-            this.calculate_choices(line, column, this.table[line][column])
-            for (let i = 0; i <= 7; i++) {
-                for (let j = 0; j <= 7; j++) {
-                    if(this.choices[i][j] === 1){
-                        items[i].children[j].style.backgroundColor = 'black';
-                    }
-                }
-            }
-        }
-    }
-    fulfil_css(){
-        let m = 0
-        let gameTable = document.getElementsByClassName('game-table')
-        for (let i = 0; i <= 7; i++) {
-            for (let j = 0; j <= 7; j++) {
-                m += 1
-                if(j%2 === 0 && i%2 === 0){
-                    gameTable[0].children[i].children[j].style.backgroundColor = 'darkgrey'
-                }
-                else if(j%2 === 1 && i%2 === 1){
-                    gameTable[0].children[i].children[j].style.backgroundColor = 'darkgrey'
-                }
-                else{
-                    gameTable[0].children[i].children[j].style.backgroundColor = 'white'  
-                }
-
-            }
-        }
-    }
-    insert_image(line, column){
-        console.log('Inserting image in line ' + line + ' and column ' + column)
-        let items = document.getElementsByClassName('row')
-
-        if(this.table[line][column].name !== 'nothing'){
-            let DOM_img = document.createElement('img')
-            DOM_img.src = './images/' + this.table[line][column].side + '_' + this.table[line][column].name + '.png'
-            items[line].children[column].appendChild(DOM_img)
-        }
-        else console.log('Cant insert image in this pieces, exist obj_nothing there')
-    }
-    remove_image(line, column){
-        let items = document.getElementsByClassName('row')
-        let img = items[line].children[column].getElementsByTagName('img')
-
-        if(typeof(img[0]) === 'object'){
-            items[line].children[column].removeChild(img[0])
-            this.fulfil_css()
-            return true
-        }
-        else{
-            console.log('Cant remove image, theres no object')
-            return false
-        }
-    }
-    DOM_change_background(color){
-        let item = document.getElementsByClassName('container')
-        item[0].style.backgroundColor = color;
-    }
-    print_choices(){
-        console.log('Tabela de escolhas do ' + this.name)
-        console.table(this.choices)
-    }
 }
+/* class History{
+    constructor(){
+        this.movements = []
+        this.counter = 0
+    }
+    add_piece_movement(line, column){
+
+    }
+    add_piece_death()
+    
+    remove_last_piece_movement()
+    
+} */
+
 class Turn{
     constructor(){
         this.side = 'white'
@@ -318,8 +274,10 @@ class Turn{
 }
 
 //TODO: 
-//     apply undo
-//     if king is in check, can't move others pieces(unless is to help the king)
+//     save all the movements made in board
+//     undo have to return multiple times and not just 1
+//     if the piece that is in front of the king and protecting it, it will not move unless its to save
+//     protecting the king
 //     if the king can't move, check mate!
 
 //     if clicke in star game, the game should start
@@ -353,7 +311,7 @@ const board = new Board()
 
 function check_turn_side(line, column){
     if(board.turn.side === board.table[line][column].side){
-        board.print_choices_html(line, column)
+        board.dom.print_choices(line, column, board)
         if(board.table[line][column].name !== 'nothing'){
             board.actual_object = board.table[line][column]
         }
@@ -374,13 +332,18 @@ function print_pieces_dead_html(){
 
 
 let start = document.getElementById('start-game')
-start.addEventListener('click', buttonClick)
-function buttonClick(elem){
-    console.log('Button clicked')
+start.addEventListener('click', buttonClickStartGame)
+function buttonClickStartGame(elem){
     start_game()
-
+}
+let undo = document.getElementById('undo')
+undo.addEventListener('click', buttonClickUndo)
+function buttonClickUndo(elem){
+    console.log('Button undo clicked')
+    board.undo()
+    board.turn.changeTurn()
 }
 
 function start_game(){
-    board.fulfil_css()
+    board.dom.fulfil_css()
 }

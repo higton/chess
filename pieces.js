@@ -84,6 +84,8 @@ class Pawn extends Piece{
         }
     }
     calculate_choices(board){
+        console.log(this.positionX + ' ' + this.positionY)
+
         this.calculate_attack_choices(board)
 
         if(this.side === 'black' && this.positionY === 1){
@@ -102,19 +104,17 @@ class Pawn extends Piece{
                 }
             }
         }
-        else if(this.side === 'black'){
+        else if(this.side === 'black' && this.positionY + 1 <= 7){
             if(board.table[this.positionY + 1][this.positionX].name === 'nothing'){
                 board.choices[this.positionY + 1][this.positionX] = 1
             }
         }
         
-        else if(this.side === 'white'){
+        else if(this.side === 'white' && this.positionY -1 >=0){
             if(board.table[this.positionY -1][this.positionX].name === 'nothing'){
                 board.choices[this.positionY - 1][this.positionX] = 1
             }
         }
-
-
     }
 
 }
