@@ -109,13 +109,15 @@ class Board{
     }
 
     insert_position(line, column, piece){
-        console.log('Functioner insert_position() called in board, line: ' + line + ' column ' + column + ' piece.name  ' + piece.name)
+        console.log('Function insert_position() called in board, line: ' + line + ' column ' + column + ' piece.name  ' + piece.name)
+        this.old_object = 0
 
         this.old_positionX = piece.positionX
         this.old_positionY = piece.positionY
         this.actual_object = piece
 
         if(piece.insert_position(line, column, this)){
+
             //remove images from the actual position
             if( this.dom.remove_image(line, column) ){
                 this.old_object = this.table[line][column]
@@ -144,26 +146,37 @@ class Board{
         }
         piece.calculate_choices(this)
 
-        //if king is in check, will enter in each elem from the matrix choices
-        //if choices[i][j] === 1, check if this movement will help release king
-        //if can't release king from check, then choices[i][j] = 0
-
-         if(this.white_king_in_check === true && this.turn.side === 'white'){
+        //TODO:
+        //     bug when checking piece that killed on the round before
+        //For each choice calculate if the king will be in danger,
+        //if he will be in check then theres no choice to move there
+/*         if(this.turn.side === 'white'){
             this.calculate_possibility_release_king_from_check(piece)     
         }
-        else if(this.black_king_in_check === true && this.turn.side === 'black'){
+        else if(this.turn.side === 'black'){
             this.calculate_possibility_release_king_from_check(piece)     
-        }
+        } */
     }
     undo(){
+        let tmp = this.old_object
+
         this.choices[this.old_positionY][this.old_positionX] = 1
         this.insert_position(this.old_positionY, this.old_positionX, this.actual_object)
         this.choices[this.old_positionY][this.old_positionX] = 0
 
-        if(typeof(this.old_object) === 'object'){
-            this.choices[this.old_object.positionY][this.old_object.positionX] = 1
-            this.insert_position(this.old_object.positionY, this.old_object.positionX, this.old_object)
-            this.choices[this.old_object.positionY][this.old_object.positionX] = 1
+        //if theres an object attacked, will return to his position
+        if(typeof(tmp) === 'object'){
+            this.choices[tmp.positionY][tmp.positionX] = 1
+            this.insert_position(tmp.positionY, tmp.positionX, tmp)
+            this.choices[tmp.positionY][tmp.positionX] = 1
+
+            //try fixing the score
+            if(tmp.side === 'black'){
+                this.number_black_pieces_dead -= 1
+            }
+            else if(tmp.side === 'white'){
+                this.number_white_pieces_dead -= 1
+            }
         }
 
     }
@@ -274,19 +287,20 @@ class Turn{
 }
 
 //TODO: 
+//     fix the scores
+//     if the king can't move, check mate!
 //     save all the movements made in board
 //     undo have to return multiple times and not just 1
-//     if the piece that is in front of the king and protecting it, it will not move unless its to save
-//     protecting the king
-//     if the king can't move, check mate!
 
-//     if clicke in star game, the game should start
+//     if clicke in start game, the game should start
 //     if clicked again in start game, the game should reset
 //     if clicked again in the piece, will not show the possibilities
 //     show the dead pieces on the side
 
 //     separate the code in multiple files
 //     create more classes
+//     reduce side effects on functions
+//     organize functions according to stepdown rule
 //     refactor the if conditions to be more pure
 //     refactor the class pawn
 

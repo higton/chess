@@ -22,9 +22,7 @@ class DOM{
         console.log('Function print_choices from DOM called')
         board.create_matrix_choices()
         this.fulfil_css()
-        console.log(board.choices)
         board.calculate_check_probability()
-        console.log(board.choices)
 
         let items = document.getElementsByClassName('row')
         if(board.table[line][column].name !== 'nothing'){
