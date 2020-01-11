@@ -1,5 +1,5 @@
 class DOM {
-  fulfil_css() {
+  fulfilCss() {
     let m = 0;
     const gameTable = document.getElementsByClassName('game-table');
     for (let i = 0; i <= 7; i++) {
@@ -15,16 +15,15 @@ class DOM {
       }
     }
   }
-
-  print_choices(line, column, board) {
-    console.log('Function print_choices from DOM called');
-    board.create_matrix_choices();
-    this.fulfil_css();
-    board.isKingInCheck();
+  //impure
+  printChoices(line, column, board) {
+    console.log('Function printChoices from DOM called');
+    board.createMatrixChoices();
+    this.fulfilCss();
 
     const items = document.getElementsByClassName('row');
     if (board.table[line][column].name !== 'nothing') {
-      board.calculate_choices(line, column, board.table[line][column]);
+      board.choices = board.calculateChoices(line, column, board.table[line][column]);
       for (let i = 0; i <= 7; i++) {
         for (let j = 0; j <= 7; j++) {
           if (board.choices[i][j] === 1) {
@@ -35,7 +34,7 @@ class DOM {
     }
   }
 
-  insert_image(line, column, board) {
+  insertImage(line, column, board) {
     console.log(`Inserting image in line ${line} and column ${column}`);
     const items = document.getElementsByClassName('row');
 
@@ -46,20 +45,20 @@ class DOM {
     } else console.log('Cant insert image in this pieces, exist obj_nothing there');
   }
 
-  remove_image(line, column) {
+  removeImage(line, column) {
     const items = document.getElementsByClassName('row');
     const img = items[line].children[column].getElementsByTagName('img');
 
     if (typeof img[0] === 'object') {
       items[line].children[column].removeChild(img[0]);
-      this.fulfil_css();
+      this.fulfilCss();
       return true;
     }
     console.log('Cant remove image, theres no object');
     return false;
   }
 
-  change_background(color) {
+  changeBackground(color) {
     const item = document.getElementsByClassName('container');
     item[0].style.backgroundColor = color;
   }

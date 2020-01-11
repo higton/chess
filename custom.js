@@ -26,21 +26,21 @@ const table = document.getElementsByClassName('game-table');
 
 const board = new Board();
 
-const check_turn_side = (line, column) => {
+const printChoices = (line, column) => {
   if (board.turn.side === board.table[line][column].side) {
-    board.dom.print_choices(line, column, board);
+    board.dom.printChoices(line, column, board);
     if (board.table[line][column].name !== 'nothing') {
       board.actual_object = board.table[line][column];
     }
   }
 };
-const check_position = (line, column) => {
+const checkPosition = (line, column) => {
   if (board.choices[line][column] === 1) {
-    board.insert_position(line, column, board.actual_object);
+    board.insertPosition(line, column, board.actual_object);
     board.turn.changeTurn();
   }
 };
-const print_pieces_dead_html = () => {
+const printPiecesDeadHtml = () => {
   let paragraph = document.getElementById('p1');
   paragraph.textContent = board.number_white_pieces_dead;
   paragraph = document.getElementById('p2');
@@ -52,9 +52,9 @@ const boardClick = (elem) => {
   line = parseInt(elem.target.parentNode.id);
   column = parseInt(elem.target.id);
 
-  check_turn_side(line, column);
-  check_position(line, column);
-  print_pieces_dead_html();
+  printChoices(line, column);
+  checkPosition(line, column);
+  printPiecesDeadHtml();
 };
 
 table[0].addEventListener('click', boardClick);
@@ -70,14 +70,14 @@ const buttonClickUndo = (elem) => {
   console.log('Button undo clicked');
   board.undo();
   board.turn.changeTurn();
-  board.create_matrix_choices();
-  print_pieces_dead_html();
+  board.createMatrixChoices();
+  printPiecesDeadHtml();
 };
 
 undo.addEventListener('click', buttonClickUndo);
 
 const start_game = () => {
-  board.dom.fulfil_css();
+  board.dom.fulfilCss();
 };
 
 start.addEventListener('click', buttonClickStartGame);
