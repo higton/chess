@@ -145,12 +145,13 @@ class Board {
       this.enemyChoices = this.calculateEnemySideChoices(piece);
       this.table[line][column] = piece;
     }
-    
-    let tmpChoices = piece.calculateChoices(this);
-    tmpChoices = this.calculatePossibilityReleaseKingFromCheck(piece, tmpChoices);
+
+    let tmpChoices = this.copyMatrix(piece.calculateChoices(this))
+    tmpChoices = this.copyMatrix(this.calculatePossibilityReleaseKingFromCheck(piece, tmpChoices))
 
     return tmpChoices
   }
+  //impure
   undo() {
     let savingChoicesValue = this.copyMatrix(this.choices)
 
@@ -209,7 +210,6 @@ class Board {
 
     let tmp = this.copyMatrix(this.choices)
     this.choices = this.copyMatrix(savingChoicesValue)
-    console.table(tmp)
     return tmp
   }
   //impure+-
@@ -237,23 +237,26 @@ class Board {
     this.dom.changeBackground('white');
     return false;
   }
-  
+  //Todo: this form of calculating is wrong
+  //       it should be merging the matrix every iteraction
   calculateEnemySideChoices(king_obj) {
     // create a loop and calculate the choices in each piece
-    let enemyChoices = []
+
+    //just declaring a matrix
+    let enemyChoices = this.createMatrix()
 
     for (let i = 0; i <= 7; i++) {
       for (let j = 0; j <= 7; j++) {
         if (this.table[i][j].side === king_obj.other_side) {
           if (this.table[i][j].name !== 'pawn') {
-            enemyChoices = this.table[i][j].calculateChoices(this);
+            this.mergeMatrices(this.table[i][j].calculateChoices(this), enemyChoices)
           }
           if (this.table[i][j].name === 'pawn') {
-            enemyChoices = this.table[i][j].calculateFutureAttack(this);
+            this.mergeMatrices(this.table[i][j].calculateFutureAttack(this), enemyChoices)
           }
         }
       }
-    } 
+    }
     return enemyChoices
   }
   //impure
@@ -268,18 +271,62 @@ class Board {
   }
 
   copyMatrix(matrixOrigin){
-    let arr = [];
+    let matrix = [];
     for (let i = 0; i <= 7; i++) {
-      arr.push([0])
+      matrix.push([0])
       for (let j = 0; j <= 7; j++) {
-        arr[i][j] = 0;
+        matrix[i][j] = 0;
       }
     }
     for (let i = 0; i <= 7; i++) {
       for (let j = 0; j <= 7; j++) {
-        arr[i][j] = matrixOrigin[i][j];
+        matrix[i][j] = matrixOrigin[i][j];
       }
     }
-    return arr
+    return matrix 
+  }
+  //IMPURE
+  isGameFinished(){
+    
+    for(let i = 0; i <= 7; i++){
+      for(let j = 0; j <= 7; j++){
+        if(this.table[i][j].side === this.turn.side){
+          this.choices = this.calculateChoices(i, j, this.table[i][j])
+          console.table(this.table[i][j])
+          console.table(this.choices)
+          if(!this.isChoicesJustZeros()) return false
+        }
+      }
+    }
+    console.table(this.choices)
+    return true
+  }
+
+  isChoicesJustZeros(){
+    for(let i = 0; i <= 7; i++){
+      for(let j = 0; j <= 7; j++){
+        if(this.choices[i][j] !== 0){
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+  mergeMatrices(oldMatrix, newMatrix){
+    for (let i = 0; i <= 7; i++) {
+        for (let j = 0; j <= 7; j++) {
+           if(oldMatrix[i][j] === 1){
+               newMatrix[i][j] = 1
+           }
+        }
+    }
+  }
+  createMatrix() {
+    const matrix = [];
+    for (let i = 0; i < 8; i++) {
+      matrix.push(new Array(8).fill(0));
+    }
+    return matrix
   }
 }

@@ -18,9 +18,15 @@ class DOM {
   //impure
   printChoices(line, column, board) {
     console.log('Function printChoices from DOM called');
+    if(board.isKingInCheck()){
+      debugger
+      if(board.isGameFinished()){
+        console.log('FINISHED')
+        debugger
+      }
+    }
     board.createMatrixChoices();
     this.fulfilCss();
-
     const items = document.getElementsByClassName('row');
     if (board.table[line][column].name !== 'nothing') {
       board.choices = board.calculateChoices(line, column, board.table[line][column]);

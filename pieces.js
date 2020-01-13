@@ -15,6 +15,7 @@ class Piece{
 
       this.createMatrix()
   }
+  //TODO: change this function
   createMatrix() {
     const matrix = [];
     for (let i = 0; i < 8; i++) {
@@ -422,5 +423,5 @@ class Queen extends Piece{
            }
         }
     }
-}
+  }
 }
