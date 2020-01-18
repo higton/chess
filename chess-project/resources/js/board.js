@@ -17,73 +17,6 @@ class Board {
     this.enemyChoices = this.choices;
     this.white_king_in_check = false;
     this.black_king_in_check = false;
-
-    this.king_white = new King('king', 'white');
-    this.king_black = new King('king', 'black');
-    this.bishop_white1 = new Bishop('bishop', 'white');
-    this.bishop_white2 = new Bishop('bishop', 'white');
-    this.bishop_black1 = new Bishop('bishop', 'black');
-    this.bishop_black2 = new Bishop('bishop', 'black');
-    this.knight_white1 = new Knight('knight', 'white');
-    this.knight_white2 = new Knight('knight', 'white');
-    this.knight_black1 = new Knight('knight', 'black');
-    this.knight_black2 = new Knight('knight', 'black');
-    this.rook_white1 = new Rook('rook', 'white');
-    this.rook_white2 = new Rook('rook', 'white');
-    this.rook_black1 = new Rook('rook', 'black');
-    this.rook_black2 = new Rook('rook', 'black');
-    this.pawn_white1 = new Pawn('pawn', 'white');
-    this.pawn_white2 = new Pawn('pawn', 'white');
-    this.pawn_white3 = new Pawn('pawn', 'white');
-    this.pawn_white4 = new Pawn('pawn', 'white');
-    this.pawn_white5 = new Pawn('pawn', 'white');
-    this.pawn_white6 = new Pawn('pawn', 'white');
-    this.pawn_white7 = new Pawn('pawn', 'white');
-    this.pawn_white8 = new Pawn('pawn', 'white');
-    this.pawn_black1 = new Pawn('pawn', 'black');
-    this.pawn_black2 = new Pawn('pawn', 'black');
-    this.pawn_black3 = new Pawn('pawn', 'black');
-    this.pawn_black4 = new Pawn('pawn', 'black');
-    this.pawn_black5 = new Pawn('pawn', 'black');
-    this.pawn_black6 = new Pawn('pawn', 'black');
-    this.pawn_black7 = new Pawn('pawn', 'black');
-    this.pawn_black8 = new Pawn('pawn', 'black');
-
-    this.queen_white = new Queen('queen', 'white');
-    this.queen_black = new Queen('queen', 'black');
-
-    this.insertPiece(7, 4, this.king_white);
-    this.insertPiece(0, 4, this.king_black);
-    this.insertPiece(7, 2, this.bishop_white1);
-    this.insertPiece(7, 5, this.bishop_white2);
-    this.insertPiece(0, 2, this.bishop_black1);
-    this.insertPiece(0, 5, this.bishop_black2);
-    this.insertPiece(7, 1, this.knight_white1);
-    this.insertPiece(7, 6, this.knight_white2);
-    this.insertPiece(0, 1, this.knight_black1);
-    this.insertPiece(0, 6, this.knight_black2);
-    this.insertPiece(7, 0, this.rook_white1);
-    this.insertPiece(7, 7, this.rook_white2);
-    this.insertPiece(0, 0, this.rook_black1);
-    this.insertPiece(0, 7, this.rook_black2);
-    this.insertPiece(1, 0, this.pawn_black1);
-    this.insertPiece(1, 1, this.pawn_black2);
-    this.insertPiece(1, 2, this.pawn_black3);
-    this.insertPiece(1, 3, this.pawn_black4);
-    this.insertPiece(1, 4, this.pawn_black5);
-    this.insertPiece(1, 5, this.pawn_black6);
-    this.insertPiece(1, 6, this.pawn_black7);
-    this.insertPiece(1, 7, this.pawn_black8);
-    this.insertPiece(6, 0, this.pawn_white1);
-    this.insertPiece(6, 1, this.pawn_white2);
-    this.insertPiece(6, 2, this.pawn_white3);
-    this.insertPiece(6, 3, this.pawn_white4);
-    this.insertPiece(6, 4, this.pawn_white5);
-    this.insertPiece(6, 5, this.pawn_white6);
-    this.insertPiece(6, 6, this.pawn_white7);
-    this.insertPiece(6, 7, this.pawn_white8);
-    this.insertPiece(7, 3, this.queen_white);
-    this.insertPiece(0, 3, this.queen_black);
   }
 
   createMatrixChoices() {
@@ -108,7 +41,13 @@ class Board {
     this.dom.insertImage(line, column, this);
   }
 
+  removePiece(line, column){
+    this.table[line][column] = this.obj_nothing
+    this.dom.removeImage(line, column)
+  }
   //impure
+  //TODO: this method needs refactoring
+  //      create function isImage using part of the function removeImage
   insertPosition(line, column, piece) {
     console.log(
       `Function insertPosition() called in board, line: ${line} column ${column} piece.name  ${piece.name}`,
@@ -128,13 +67,16 @@ class Board {
       // remove images from the past
       this.dom.removeImage(this.old_positionY, this.old_positionX);
 
-      // replace objects
-      this.table[this.old_positionY][this.old_positionX] = this.obj_nothing;
-      this.table[line][column] = piece;
+      this.replaceObjects(line, column, piece)
 
       // insert image in the actual position
       this.dom.insertImage(line, column, this);
     }
+  }
+  //impure
+  replaceObjects(line, column, piece){
+    this.table[this.old_positionY][this.old_positionX] = this.obj_nothing;
+    this.table[line][column] = piece;
   }
   //impure
   calculateChoices(line, column, piece) {
@@ -146,14 +88,14 @@ class Board {
       this.table[line][column] = piece;
     }
 
-    let tmpChoices = this.copyMatrix(piece.calculateChoices(this))
-    tmpChoices = this.copyMatrix(this.calculatePossibilityReleaseKingFromCheck(piece, tmpChoices))
+    let tmpChoices = Matrix.copyMatrix(piece.calculateChoices(this))
+    tmpChoices = Matrix.copyMatrix(this.calculatePossibilityReleaseKingFromCheck(piece, tmpChoices))
 
     return tmpChoices
   }
   //impure
   undo() {
-    let savingChoicesValue = this.copyMatrix(this.choices)
+    let savingChoicesValue = Matrix.copyMatrix(this.choices)
 
     const tmp = this.old_object;
 
@@ -173,7 +115,7 @@ class Board {
 
       this.revertScore(tmp);
     }
-    this.choices = this.copyMatrix(savingChoicesValue)
+    this.choices = Matrix.copyMatrix(savingChoicesValue)
   }
   //impure
   revertScore(tmp) {
@@ -192,8 +134,8 @@ class Board {
     let tmpPositionX = piece.positionX
     let tmpPositionY = piece.positionY
 
-    let savingChoicesValue = this.copyMatrix(this.choices)
-    this.choices = this.copyMatrix(choices)
+    let savingChoicesValue = Matrix.copyMatrix(this.choices)
+    this.choices = Matrix.copyMatrix(choices)
 
 
     for (let i = 0; i <= 7; i++) {
@@ -208,8 +150,8 @@ class Board {
       }
     }
 
-    let tmp = this.copyMatrix(this.choices)
-    this.choices = this.copyMatrix(savingChoicesValue)
+    let tmp = Matrix.copyMatrix(this.choices)
+    this.choices = Matrix.copyMatrix(savingChoicesValue)
     return tmp
   }
   //impure
@@ -225,12 +167,10 @@ class Board {
     }
 
     if (enemyChoices[this.king_white.positionY][this.king_white.positionX] === 1 && this.turn.side === 'white') {
-      console.log('okidoki');
       this.dom.changeBackground('red');
       return true;
     }
     if (enemyChoices[this.king_black.positionY][this.king_black.positionX] === 1 && this.turn.side === 'black') {
-      console.log('okidoki');
       this.dom.changeBackground('darkred');
       return true;
     }
@@ -266,22 +206,6 @@ class Board {
       this.black_pieces_dead[this.number_black_pieces_dead] = piece;
       this.number_black_pieces_dead += 1;
     }
-  }
-
-  copyMatrix(matrixOrigin){
-    let matrix = [];
-    for (let i = 0; i <= 7; i++) {
-      matrix.push([0])
-      for (let j = 0; j <= 7; j++) {
-        matrix[i][j] = 0;
-      }
-    }
-    for (let i = 0; i <= 7; i++) {
-      for (let j = 0; j <= 7; j++) {
-        matrix[i][j] = matrixOrigin[i][j];
-      }
-    }
-    return matrix 
   }
   isGameFinished(){
     let matrix = Matrix.createMatrix()

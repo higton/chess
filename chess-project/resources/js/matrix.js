@@ -10,6 +10,21 @@ class Matrix{
       }
       return true
     }
+    static copyMatrix(matrixOrigin){
+      let matrix = [];
+      for (let i = 0; i <= 7; i++) {
+        matrix.push([0])
+        for (let j = 0; j <= 7; j++) {
+          matrix[i][j] = 0;
+        }
+      }
+      for (let i = 0; i <= 7; i++) {
+        for (let j = 0; j <= 7; j++) {
+          matrix[i][j] = matrixOrigin[i][j];
+        }
+      }
+      return matrix 
+    }
   
     static mergeMatrices(oldMatrix, newMatrix){
       for (let i = 0; i <= 7; i++) {
