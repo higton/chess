@@ -28,7 +28,8 @@ body{
   margin-left: 15vw;
   height: 90%;
   text-align: center;
-  width: 18vh;
+  width: 14vh;
+  opacity: 0;
 }
 
 .game-table{
@@ -56,11 +57,13 @@ body{
 .cell img{
   position: relative;
   float: left;
-  bottom: 20px;
+  bottom: +150px;
   right: 23px;
   height: 50px;
   width: 50px;
   pointer-events: none; /* prevents images from being clickable */
+  transition-duration: 5s;
+  opacity: 0;
 }
 
 .cell text{
@@ -85,6 +88,7 @@ button#undo{
   width: 100px;
   height: 3vh;
   left: 40%;
+  opacity: 0;
 }
 
 @media(max-width:1200px){

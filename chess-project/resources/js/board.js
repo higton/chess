@@ -4,6 +4,7 @@ class Board {
     this.turn = new Turn();
     this.dom = new DOM();
     this.obj_nothing = new Nothing();
+    this.gameStarted = false
 
     this.white_side_points = 0;
     this.black_side_points = 0;
@@ -60,12 +61,13 @@ class Board {
 
     if (piece.insertPosition(line, column, this)) {
       // remove images from the actual position
-      if (this.dom.removeImage(line, column)) {
+      if (this.isObject(line, column)) {
         this.old_object = this.table[line][column];
         this.addDeathScore(this.table[line][column]);
       }
-      // remove images from the past
+      // remove images from the past and current position
       this.dom.removeImage(this.old_positionY, this.old_positionX);
+      this.dom.removeImage(line, column)
 
       this.replaceObjects(line, column, piece)
 
@@ -73,10 +75,35 @@ class Board {
       this.dom.insertImage(line, column, this);
     }
   }
+  simulateInsertPosition(line, column, piece) {
+    this.old_object = 0;
+
+    this.old_positionX = piece.positionX;
+    this.old_positionY = piece.positionY;
+    this.actual_object = piece;
+
+    if (piece.insertPosition(line, column, this)) {
+      // remove images from the actual position
+      if (this.isObject(line, column)) {
+        this.old_object = this.table[line][column];
+        this.addDeathScore(this.table[line][column]);
+      }
+      this.replaceObjects(line, column, piece)
+    }
+  }
   //impure
   replaceObjects(line, column, piece){
     this.table[this.old_positionY][this.old_positionX] = this.obj_nothing;
     this.table[line][column] = piece;
+  }
+  isObject(line, column){
+    const items = document.getElementsByClassName('row');
+    const img = items[line].children[column].getElementsByTagName('img');
+
+    if (typeof img[0] === 'object') {
+      return true
+    }
+    return false
   }
   //impure
   calculateChoices(line, column, piece) {
@@ -89,6 +116,7 @@ class Board {
     }
 
     let tmpChoices = Matrix.copyMatrix(piece.calculateChoices(this))
+    //todo: this one is bugging the animation
     tmpChoices = Matrix.copyMatrix(this.calculatePossibilityReleaseKingFromCheck(piece, tmpChoices))
 
     return tmpChoices
@@ -100,7 +128,7 @@ class Board {
     const tmp = this.old_object;
 
     this.choices[this.old_positionY][this.old_positionX] = 1;
-    this.insertPosition(
+    this.simulateInsertPosition(
       this.old_positionY,
       this.old_positionX,
       this.actual_object,
@@ -110,7 +138,7 @@ class Board {
     // if theres an object attacked, will return to his position
     if (typeof tmp === 'object') {
       this.choices[tmp.positionY][tmp.positionX] = 1;
-      this.insertPosition(tmp.positionY, tmp.positionX, tmp);
+      this.simulateInsertPosition(tmp.positionY, tmp.positionX, tmp);
       this.choices[tmp.positionY][tmp.positionX] = 1;
 
       this.revertScore(tmp);
@@ -141,7 +169,7 @@ class Board {
     for (let i = 0; i <= 7; i++) {
       for (let j = 0; j <= 7; j++) {
         if (this.choices[i][j] === 1) {
-          this.insertPosition(i, j, piece);
+          this.simulateInsertPosition(i, j, piece);
           if (this.isKingInCheck()) {
             this.choices[i][j] = 0;
           }

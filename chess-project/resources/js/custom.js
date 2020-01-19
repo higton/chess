@@ -1,29 +1,27 @@
 // TODO:
-//     Bug:
-//     1. When resize the window the animation is in trasition
-//     2. Is white turn when it shouldnt be
-//        This bug happens on the first piece moved, if clicked 2 times
-//        it will be his turn and it will allow other pieces to move too
-//     3. After the Start game is clicked for the second time, its always
-//        white turn
-//
 //     Important:
-//     1. Ajust the front-end
-//     2. Add animations when inserting the initial pieces
-//     3. save all the movements made in board(maybe mongodb)
+//     1. when the game is won, the background is still red and the score
+//        didnt reset, so its important to reset all the css too
+//     1. refactor the board,js, so it doesnt need the simulateInsertPosition
+//     2. save all the movements made in board(maybe mongodb)
 //        undo have to return multiple times and not just 1
 
 //     Additional:
-//     1. if clicked again in start game, the game should reset
-//     2. if clicked again in the piece, will not show the possibilities
-//     3. show the dead pieces on the side
+//     1. if clicked again in the piece, will not show the possibilities
+//     2. show the dead pieces on the side
+//     3. Ajust the front-end
+//     4. adjust the red thing when the king is in check, for example
+//        in pieces that doesnt have choices it will not show the
+//        background red
 
 //     refactoring:
 //     create more classes
+//     separate pieces in various files in one folder
 //     reduce side effects on functions
 //     organize functions according to stepdown rule
 //     refactor the functions to be more pure
 //     refactor the class pawn
+//     reduce the number of parameters
 
 let line
 let column
@@ -35,16 +33,16 @@ const boardClick = (elem) => {
   elem.preventDefault()
   line = parseInt(elem.target.parentNode.id)
   column = parseInt(elem.target.id)
-
   printChoices(line, column)
   if(isPossibleToInsertPiece(line, column)){
     insertPieceInPosition(line, column)
     board.turn.changeTurn()
     checkIfGameIsFinished()
+    board.createMatrixChoices()
   }
   board.dom.updateScore()
-
 }
+table[0].addEventListener('click', boardClick)
 
 const printChoices = (line, column) => {
   if (board.turn.side === board.table[line][column].side) {
@@ -68,11 +66,10 @@ const checkIfGameIsFinished = () => {
     if(board.isGameFinished()){
       board.dom.finishGame(board.turn.other_side)
       debugger
+      startGame()
     }
   }
 }
-
-table[0].addEventListener('click', boardClick)
 
 //undo button
 const undo = document.getElementById('undo')
@@ -92,14 +89,19 @@ const start = document.getElementById('start-game');
 
 const buttonClickStartGame = (elem) => {
   startGame()
+  board.gameStarted = true
 }
 
 const startGame = () => {
+  console.log('Starting the game')
   resetGame()
-  board.dom.fulfilCss(5)
+  board.dom.startGame()
+  board.dom.fulfilBoardTable(5)
   insertInitialPieces()
   board.turn.side = 'white'
+  board.turn.other_side = 'black'
   board.dom.updateScore()
+  
 }
 const resetGame = () => {
   removePieces()
