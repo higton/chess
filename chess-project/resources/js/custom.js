@@ -2,9 +2,6 @@
 //     Important:
 //     1. when the game is won, the background is still red and the score
 //        didnt reset, so its important to reset all the css too
-//     1. refactor the board,js, so it doesnt need the simulateInsertPosition
-//     2. save all the movements made in board(maybe mongodb)
-//        undo have to return multiple times and not just 1
 
 //     Additional:
 //     1. if clicked again in the piece, will not show the possibilities
@@ -13,8 +10,12 @@
 //     4. adjust the red thing when the king is in check, for example
 //        in pieces that doesnt have choices it will not show the
 //        background red
+//     5. save all the movements made in board(maybe mongodb)
+//        undo have to return multiple times and not just 1
+//     6. When pawn get to the final line it transforms in a queen
+//        
 
-//     refactoring:
+//     Refactoring:
 //     create more classes
 //     separate pieces in various files in one folder
 //     reduce side effects on functions
@@ -60,13 +61,12 @@ const isPossibleToInsertPiece = (line, column) => {
 }
 const insertPieceInPosition = (line, column) => {
   board.insertPosition(line, column, board.actual_object);
+  board.replaceImages(line, column)
 }
 const checkIfGameIsFinished = () => {
   if(board.isKingInCheck()){
     if(board.isGameFinished()){
       board.dom.finishGame(board.turn.other_side)
-      debugger
-      startGame()
     }
   }
 }
@@ -88,6 +88,7 @@ undo.addEventListener('click', buttonClickUndo)
 const start = document.getElementById('start-game');
 
 const buttonClickStartGame = (elem) => {
+  board.gameStarted = false
   startGame()
   board.gameStarted = true
 }
@@ -96,8 +97,8 @@ const startGame = () => {
   console.log('Starting the game')
   resetGame()
   board.dom.startGame()
-  board.dom.fulfilBoardTable(5)
   insertInitialPieces()
+  board.dom.fulfilBoardTable(20)
   board.turn.side = 'white'
   board.turn.other_side = 'black'
   board.dom.updateScore()

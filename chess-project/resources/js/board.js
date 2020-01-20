@@ -21,19 +21,11 @@ class Board {
   }
 
   createMatrixChoices() {
-    const choices = [];
-    for (let i = 0; i < 8; i++) {
-      choices.push(new Array(8).fill(0));
-    }
-    this.choices = choices;
+    this.choices = Matrix.createMatrix()
   }
 
   createMatrixTable() {
-    const table = [];
-    for (let i = 0; i < 8; i++) {
-      table.push(new Array(8).fill(this.obj_nothing));
-    }
-    this.table = table;
+    this.table = Matrix.createMatrix()
   }
 
   insertPiece(line, column, piece) {
@@ -46,13 +38,7 @@ class Board {
     this.table[line][column] = this.obj_nothing
     this.dom.removeImage(line, column)
   }
-  //impure
-  //TODO: this method needs refactoring
-  //      create function isImage using part of the function removeImage
   insertPosition(line, column, piece) {
-    console.log(
-      `Function insertPosition() called in board, line: ${line} column ${column} piece.name  ${piece.name}`,
-    );
     this.old_object = 0;
 
     this.old_positionX = piece.positionX;
@@ -63,33 +49,21 @@ class Board {
       // remove images from the actual position
       if (this.isObject(line, column)) {
         this.old_object = this.table[line][column];
+        
         this.addDeathScore(this.table[line][column]);
       }
-      // remove images from the past and current position
-      this.dom.removeImage(this.old_positionY, this.old_positionX);
-      this.dom.removeImage(line, column)
-
       this.replaceObjects(line, column, piece)
-
-      // insert image in the actual position
-      this.dom.insertImage(line, column, this);
+      return true
     }
+    return false
   }
-  simulateInsertPosition(line, column, piece) {
-    this.old_object = 0;
+  replaceImages(line, column){
+    // remove images from the past and current position
+    this.dom.removeImage(this.old_positionY, this.old_positionX);
+    this.dom.removeImage(line, column)
 
-    this.old_positionX = piece.positionX;
-    this.old_positionY = piece.positionY;
-    this.actual_object = piece;
-
-    if (piece.insertPosition(line, column, this)) {
-      // remove images from the actual position
-      if (this.isObject(line, column)) {
-        this.old_object = this.table[line][column];
-        this.addDeathScore(this.table[line][column]);
-      }
-      this.replaceObjects(line, column, piece)
-    }
+    // insert image in the actual position
+    this.dom.insertImage(line, column, this);
   }
   //impure
   replaceObjects(line, column, piece){
@@ -128,7 +102,7 @@ class Board {
     const tmp = this.old_object;
 
     this.choices[this.old_positionY][this.old_positionX] = 1;
-    this.simulateInsertPosition(
+    this.insertPosition(
       this.old_positionY,
       this.old_positionX,
       this.actual_object,
@@ -138,7 +112,7 @@ class Board {
     // if theres an object attacked, will return to his position
     if (typeof tmp === 'object') {
       this.choices[tmp.positionY][tmp.positionX] = 1;
-      this.simulateInsertPosition(tmp.positionY, tmp.positionX, tmp);
+      this.insertPosition(tmp.positionY, tmp.positionX, tmp);
       this.choices[tmp.positionY][tmp.positionX] = 1;
 
       this.revertScore(tmp);
@@ -169,7 +143,7 @@ class Board {
     for (let i = 0; i <= 7; i++) {
       for (let j = 0; j <= 7; j++) {
         if (this.choices[i][j] === 1) {
-          this.simulateInsertPosition(i, j, piece);
+          this.insertPosition(i, j, piece);
           if (this.isKingInCheck()) {
             this.choices[i][j] = 0;
           }

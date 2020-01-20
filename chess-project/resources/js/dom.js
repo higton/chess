@@ -1,39 +1,25 @@
-/* TODO:
-    1. Make the animation of inserting image different of moving image
- */    
 class DOM {
   startGame(){
     const gameScore = document.getElementsByClassName('game-score');
     const undoButton = document.getElementById('undo');
-    const startGameButton = document.getElementById('start-game');
+    const startButton = document.getElementById('start-game');
 
-    this.animateScores(gameScore)
-    this.animateUndoButton(undoButton)
+    this.repositionStartGameButton(startButton)
+    Animation.showLines()
+    Animation.showGameTable()
+    Animation.animateScores(gameScore)
+    Animation.animateUndoButton(undoButton)
   }
-  animateScores(gameScore){
-    gameScore[0].style.transition = "3s";
-    gameScore[1].style.transition =  "3s";
-
-    gameScore[0].style.transitionDelay = "4s";
-    gameScore[1].style.transitionDelay =  "4s";
-
-    gameScore[0].style.opacity = 1;
-    gameScore[1].style.opacity = 1;
+  repositionStartGameButton(startButton){
+    startButton.style.top = '70%'
   }
-  animateUndoButton(undoButton){
-    undoButton.style.transition =  "3s";
-
-    undoButton.style.transitionDelay =  "4s";
-
-    undoButton.style.opacity = 1;
-  }
-
   fulfilBoardTable(time){
     let m = 0;
     const gameTable = document.getElementsByClassName('game-table');
     for (let i = 0; i <= 7; i++) {
       for (let j = 0; j <= 7; j++) {
-        this.animateBoardTable(gameTable, time, i, j)
+        Animation.setBoardTableTransition(gameTable, time, i, j)
+        this.showCellBorder(gameTable, i, j)
 
         m += 1;
         if (j % 2 === 0 && i % 2 === 0) {
@@ -46,10 +32,9 @@ class DOM {
       }
     }
   }
-  animateBoardTable(gameTable, time, i, j){
-      gameTable[0].children[i].children[j].style.transition = "all " + time + "s";
+  showCellBorder(gameTable, i, j){
+    gameTable[0].children[i].children[j].style.border = '1px solid black';
   }
-  
   finishGame(side){
     let paragraph = document.getElementById('final');
     paragraph.textContent = 'Game is Finished, ' + side + ' won';
@@ -69,14 +54,11 @@ class DOM {
         for (let j = 0; j <= 7; j++) {
           if (board.choices[i][j] === 1) {
             items[i].children[j].style.backgroundColor = 'black';
-            this.animateChoices(items, i, j)
+            Animation.setChoicesTransition(items, i, j)
           }
         }
       }
     }
-  }
-  animateChoices(items, i, j){
-    items[i].children[j].style.transition = "all 0.5s";
   }
   insertImage(line, column, board) {
     console.log(`Inserting image in line ${line} and column ${column}`);
@@ -87,28 +69,12 @@ class DOM {
       DOM_img.src = `resources/images/${board.table[line][column].side}_${board.table[line][column].name}.png`;
       items[line].children[column].appendChild(DOM_img);
 
-      this.setImageTransition(DOM_img)
+      Animation.setImageTransition(DOM_img)
       if(board.gameStarted === false){
-        this.delayInsertingImages(DOM_img, line, column)
+        Animation.delayInsertingImages(DOM_img, line, column)
       }
-      this.animateImages(DOM_img, line, column)
+      Animation.animateImages(DOM_img, line, column)
     } else console.log('Cant insert image in this pieces, exist obj_nothing there');
-  }
-  setImageTransition(DOM_img){
-    DOM_img.style.transition = 'all 0.3s ease';
-  }
-  delayInsertingImages(DOM_img, line, column){
-    if(line === 0) DOM_img.style.transitionDelay = 1 + column/4 + 's';
-    if(line === 1) DOM_img.style.transitionDelay = 3 + column/4 + 's';
-    if(line === 6) DOM_img.style.transitionDelay = 4 + column/4 + 's';
-    if(line === 7) DOM_img.style.transitionDelay = 5 + column/4 + 's';
-  }
-  animateImages(DOM_img, line, column){
-    //flushes all pending style changes and forces the layout engine to compute the element's current state, 
-    DOM_img.getBoundingClientRect()
-
-    DOM_img.style.transform = "translateY(+125px)";
-    DOM_img.style.opacity = 1;
   }
   removeImage(line, column) {
     const items = document.getElementsByClassName('row');
