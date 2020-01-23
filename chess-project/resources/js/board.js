@@ -33,11 +33,12 @@ class Board {
     piece.insertPiece(line, column);
     this.dom.insertImage(line, column, this);
   }
-
+  //impure
   removePiece(line, column){
     this.table[line][column] = this.obj_nothing
     this.dom.removeImage(line, column)
   }
+  //impure
   insertPosition(line, column, piece) {
     this.old_object = 0;
 
@@ -156,7 +157,6 @@ class Board {
     this.choices = Matrix.copyMatrix(savingChoicesValue)
     return tmp
   }
-  //impure
   isKingInCheck() {
     console.log('Function isKingInCheck() called');
     let enemyChoices = this.enemy_choices
@@ -169,14 +169,11 @@ class Board {
     }
 
     if (enemyChoices[this.king_white.positionY][this.king_white.positionX] === 1 && this.turn.side === 'white') {
-      this.dom.changeBackground('red');
       return true;
     }
     if (enemyChoices[this.king_black.positionY][this.king_black.positionX] === 1 && this.turn.side === 'black') {
-      this.dom.changeBackground('darkred');
       return true;
     }
-    this.dom.changeBackground('white');
     return false;
   }
   calculateEnemySideChoices(king_obj) {
@@ -189,10 +186,10 @@ class Board {
       for (let j = 0; j <= 7; j++) {
         if (this.table[i][j].side === king_obj.other_side) {
           if (this.table[i][j].name !== 'pawn') {
-            Matrix.mergeMatrices(this.table[i][j].calculateChoices(this), enemyChoices)
+            enemyChoices = Matrix.mergeMatrices(this.table[i][j].calculateChoices(this), enemyChoices)
           }
           if (this.table[i][j].name === 'pawn') {
-            Matrix.mergeMatrices(this.table[i][j].calculateFutureAttack(this), enemyChoices)
+            enemyChoices = Matrix.mergeMatrices(this.table[i][j].calculateFutureAttack(this), enemyChoices)
           }
         }
       }

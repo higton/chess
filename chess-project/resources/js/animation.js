@@ -1,6 +1,19 @@
 class Animation{
+    static hideStartPage(){
+        const startPage = document.getElementsByClassName('start-page');
+        const title = document.getElementById("title");
+
+        startPage[0].style.transition = "all 1s"
+        startPage[1].style.transition = "all 1s"
+
+        title.style.display = "none"
+        /* hide swords */
+        startPage[0].style.opacity = 0
+        /* hide pieces */
+        startPage[1].style.opacity = 0
+    }
     static showLines(){
-        const lines = document.getElementsByTagName('svg');
+        const lines = document.getElementsByClassName('board');
         lines[0].style.display = "inherit"
     }
     static showGameTable(){
@@ -39,7 +52,8 @@ class Animation{
         //flushes all pending style changes and forces the layout engine to compute the element's current state, 
         DOM_img.getBoundingClientRect()
 
-        DOM_img.style.transform = "translateY(+125px)";
+        DOM_img.style.transform = "translateY(+275px)";
+
         DOM_img.style.opacity = 1;
     }
     static setImageTransition(DOM_img){

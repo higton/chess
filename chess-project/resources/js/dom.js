@@ -5,6 +5,7 @@ class DOM {
     const startButton = document.getElementById('start-game');
 
     this.repositionStartGameButton(startButton)
+    Animation.hideStartPage()
     Animation.showLines()
     Animation.showGameTable()
     Animation.animateScores(gameScore)

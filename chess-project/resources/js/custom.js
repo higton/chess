@@ -1,6 +1,7 @@
 // TODO:
 //     Important:
-//     1. when the game is won, the background is still red and the score
+//     1. fix css
+//     2. when the game is won, the background is still red and the score
 //        didnt reset, so its important to reset all the css too
 
 //     Additional:

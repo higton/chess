@@ -27,13 +27,16 @@ class Matrix{
     }
   
     static mergeMatrices(oldMatrix, newMatrix){
+      let tmp = this.createMatrix()
+
       for (let i = 0; i <= 7; i++) {
           for (let j = 0; j <= 7; j++) {
-             if(oldMatrix[i][j] === 1){
-                 newMatrix[i][j] = 1
+             if(oldMatrix[i][j] === 1 || newMatrix[i][j] === 1){
+                 tmp[i][j] = 1
              }
           }
       }
+      return tmp
     }
     static createMatrix() {
       const matrix = [];
