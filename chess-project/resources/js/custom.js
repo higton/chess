@@ -1,6 +1,6 @@
 // TODO:
 //     Important:
-//     1. fix css
+//     1. make the front-end responsive
 //     2. when the game is won, the background is still red and the score
 //        didnt reset, so its important to reset all the css too
 
@@ -17,6 +17,8 @@
 //        
 
 //     Refactoring:
+//     refactor the css animation to add or remove
+//     make the function setTimeOut to turn off the animation
 //     create more classes
 //     separate pieces in various files in one folder
 //     reduce side effects on functions

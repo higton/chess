@@ -80,7 +80,6 @@ class Board {
     }
     return false
   }
-  //impure
   calculateChoices(line, column, piece) {
     console.log('Function calculateChoices called');
     // calculate choices that will see if the king can move
@@ -127,6 +126,16 @@ class Board {
       this.number_black_pieces_dead -= 1;
     } else if (tmp.side === 'white' && this.number_white_pieces_dead > 0) {
       this.number_white_pieces_dead -= 1;
+    }
+  }
+  //impure
+  addDeathScore(piece) {
+    if (piece.side === 'white') {
+      this.white_pieces_dead[this.number_white_pieces_dead] = piece;
+      this.number_white_pieces_dead += 1;
+    } else if (piece.side === 'black') {
+      this.black_pieces_dead[this.number_black_pieces_dead] = piece;
+      this.number_black_pieces_dead += 1;
     }
   }
   //TODO: fix bug on this part of code
@@ -176,10 +185,8 @@ class Board {
     }
     return false;
   }
+  // create a loop and calculate the choices in each piece
   calculateEnemySideChoices(king_obj) {
-    // create a loop and calculate the choices in each piece
-
-    //just declaring a matrix
     let enemyChoices = Matrix.createMatrix()
 
     for (let i = 0; i <= 7; i++) {
@@ -196,16 +203,7 @@ class Board {
     }
     return enemyChoices
   }
-  //impure
-  addDeathScore(piece) {
-    if (piece.side === 'white') {
-      this.white_pieces_dead[this.number_white_pieces_dead] = piece;
-      this.number_white_pieces_dead += 1;
-    } else if (piece.side === 'black') {
-      this.black_pieces_dead[this.number_black_pieces_dead] = piece;
-      this.number_black_pieces_dead += 1;
-    }
-  }
+
   isGameFinished(){
     let matrix = Matrix.createMatrix()
     for(let i = 0; i <= 7; i++){

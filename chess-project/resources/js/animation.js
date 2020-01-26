@@ -13,40 +13,52 @@ class Animation{
         startPage[1].style.opacity = 0
     }
     static showLines(){
-        const lines = document.getElementsByClassName('board');
-        lines[0].style.display = "inherit"
+        const boardLines = document.getElementsByClassName('board');
+        boardLines[0].children[0].classList.add("animate")
+
+        const lines = document.getElementsByClassName('line');
+        for(let i=0; i<=13; i++){
+            lines[0].children[i].classList.add('animate')
+        }
+        for(let i=0; i<=13; i++){
+            setTimeout(function(){
+                lines[0].children[i].classList.remove('animate') }, 3700);
+        }
+        debugger
     }
     static showGameTable(){
         const gameTable = document.getElementsByClassName('game-table');
-        gameTable[0].style.transition = "all 3s"
-        gameTable[0].style.display = "inherit"
-    }
-    static animateScores(gameScore){
-        gameScore[0].style.transition = "3s";
-        gameScore[1].style.transition =  "3s";
-
-        gameScore[0].style.transitionDelay = "4s";
-        gameScore[1].style.transitionDelay =  "4s";
-
-        gameScore[0].style.opacity = 1;
-        gameScore[1].style.opacity = 1;
+        gameTable[0].classList.add("animate")
+        setTimeout(function(){
+            gameTable[0].classList.remove("animate") }, 3000);}
+    static showScores(){
+        const gameScore = document.getElementsByClassName('game-score');
+        gameScore[0].classList.add("animate")
+        gameScore[1].classList.add("animate")
+        setTimeout(function(){
+            gameScore[0].classList.add("setFont")
+            gameScore[0].classList.remove("animate") }, 3700);
+        setTimeout(function(){
+            gameScore[1].classList.add("setFont")
+            gameScore[1].classList.remove("animate") }, 3700);
     }
     static animateUndoButton(undoButton){
-        undoButton.style.transition =  "3s";
-        undoButton.style.transitionDelay =  "4s";
-        undoButton.style.opacity = 1;
+        undoButton.classList.add("animate")
+        setTimeout(function(){
+            undoButton[0].classList.remove("animate") }, 3000);
     }
     static setBoardTableTransition(gameTable, time, i, j){
         gameTable[0].children[i].children[j].style.transition = "all " + time + "s";
-    }
-    static setChoicesTransition(items, i, j){
-        items[i].children[j].style.transition = "all 0.5s";
+        setTimeout(function(){
+            gameTable[0].children[i].children[j].style.transition = "all 0s"}, 3000);
     }
     static delayInsertingImages(DOM_img, line, column){    
         if(line === 0) DOM_img.style.transitionDelay = 0.5 + column/5 + 's';
         if(line === 1) DOM_img.style.transitionDelay = 2.0 + column/5 + 's';
         if(line === 6) DOM_img.style.transitionDelay = 2.0 + column/5 + 's';
         if(line === 7) DOM_img.style.transitionDelay = 0.5 + column/5 + 's';
+        setTimeout(function(){
+            DOM_img.style.transitionDelay = '0s'}, 3000);
       }
     static animateImages(DOM_img, line, column){
         //flushes all pending style changes and forces the layout engine to compute the element's current state, 

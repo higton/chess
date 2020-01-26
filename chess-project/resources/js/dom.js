@@ -8,7 +8,7 @@ class DOM {
     Animation.hideStartPage()
     Animation.showLines()
     Animation.showGameTable()
-    Animation.animateScores(gameScore)
+    Animation.showScores()
     Animation.animateUndoButton(undoButton)
   }
   repositionStartGameButton(startButton){
@@ -89,7 +89,6 @@ class DOM {
     console.log('Cant remove image, theres no object');
     return false;
   }
-
   changeBackground(color) {
     const item = document.getElementsByClassName('container');
     item[0].style.backgroundColor = color;
@@ -100,5 +99,4 @@ class DOM {
     paragraph = document.getElementById('p2')
     paragraph.textContent = board.number_black_pieces_dead
   }
-
 }
