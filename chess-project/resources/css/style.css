@@ -1,30 +1,52 @@
 .clr{
 	clear: both;
 }
+
 .container{
   padding: 1%;
   height: 90%;
   margin: 0% 10%;
 }
+
 body{
   background-color: white;
 
 }
+
 .row{
   clear: both;
 }
+
 svg{
   z-index: -1;
 }
+
 p#title{
   text-align: center;
   letter-spacing: 3px;
   text-shadow: 3px 2px red;
   font-size: 10vh;
 }
+
+p#final{
+  display: none;
+  position: absolute;
+  top: 10vh;
+  text-align: center;
+  background-color: yellow;
+}
+p#final.showKingIsInCheck{
+  display: block;
+  left: calc(50vw - 54px);
+}
+p#final.finish{
+  display: block;
+  left: calc(50vw - 92px);
+}
+
 .container-score{
   position: absolute;
-  height: 8vh;
+  height: 7vh;
   width: 80vw;
   top: 2vh;
   left: calc(50vw - 98px - 12vw - 6vw);
@@ -33,14 +55,14 @@ p#title{
 .game-score{
   background: white;
   border: 1px solid black;
-  width: 98px; height: 98px;
+  width: 98px; height: 70px;
   float: left;
   margin-left: 12vw;
-  font-size: 16px;
   text-align: center;
   font-size: 0px; /* hide text */
   display: none;
 }
+
 .game-score.animate{
   transform: scale(0);
   animation: pulsate 1s ease-in forwards;
@@ -48,20 +70,23 @@ p#title{
   opacity: 1;
   display: inherit;
 }
+
 .game-score.setFont{
-  font-size: 16px;
+  font-size: 15px;
   display: inherit;
 }
+
 .game-table{
   position: absolute;
   top: 15vh;
   left: calc(50vw - 240px);  /* always in the middle */
   box-sizing: border-box;
 }
+
 .game-table.animate{
   transition-duration: 3s;
-  display: inherit;
 }
+
 .cell{
   border: transparent;
   height: 60px;
@@ -86,7 +111,7 @@ p#title{
 button#start-game{
   position: absolute;
   top: 50%;
-  height: 20px;
+  height: 30px;
   width: 14vw;
   left: 43vw;
 }
@@ -100,6 +125,7 @@ button#undo{
   left: 20%;
   opacity: 0;
 }
+
 button#undo.animate{
   transition-delay: 3s;
   transition-duration: 3s;
@@ -144,36 +170,43 @@ svg .swords{
   stroke-dashoffset: 4000;  /* offset = deslocamento */
   animation: swords 2s linear forwards; 
 }
+
 svg #sword1{
   animation: swords 2s linear forwards; 
 }
+
 svg #sword2{
   animation: swords1 2s linear forwards; 
   animation-delay: 0.7s;
 }
+
 svg #sword3{
   animation: swords 2s linear forwards; 
   animation-delay: 0.9s;
 }
+
 svg #sword4{
   animation: swords1 2s linear forwards; 
   animation-delay: 1.1s;
 }
+
 svg #sword5{
   animation: swords 2s linear forwards; 
   animation-delay: 1.3s;
 }
+
 svg #sword6{
   animation: swords1 2s linear forwards; 
   animation-delay: 1.5s;
 }
+
 svg #sword7{
   animation: swords1 2s linear forwards; 
   animation-delay: 1.7s;
 }
+
 svg #sword8{
   animation: swords2 2s linear forwards; 
-
   animation-delay: 1.9s;
 }
 
@@ -185,6 +218,7 @@ svg .board-rect{
   height: 480px;
   display: none;
 }
+
 .board-rect.animate{
   display: box;
   display: inherit;
@@ -192,6 +226,7 @@ svg .board-rect{
   stroke-dashoffset: 2000;  /* offset = deslocamento */
   animation: border 3s linear forwards;
 }
+
 .line{
   stroke: black;
   fill: transparent;
@@ -200,44 +235,49 @@ svg .board-rect{
   stroke-dasharray: 480;
   stroke-dashoffset: 480;
 }
+
 #line1{display: none;}
 #line1.animate{
   display: inline;
   animation: line 1s linear forwards;
   animation-delay: 0.5s;
 }
+
 #line2{display: none;}
 #line2.animate{
   display: inline;
   animation: line 1s linear forwards;
   animation-delay: 0.7s;
-
 }
+
 #line3{display: none;}
 #line3.animate{
   display: inline;
   animation: line 1s linear forwards;
   animation-delay: 0.9s;
-
 }
+
 #line4{display: none;}
 #line4.animate{
   display: inline;
   animation: line 1s linear forwards;
   animation-delay: 1.1s;
 }
+
 #line5{display: none;}
 #line5.animate{
   display: inline;
   animation: line 1s linear forwards;
   animation-delay: 1.3s;
 }
+
 #line6{display: none;}
 #line6.animate{
   display: inline;
   animation: line 1s linear forwards;
   animation-delay: 1.5s;
 }
+
 #line7{display: none;}
 #line7.animate{
   display: inline;
@@ -259,37 +299,37 @@ svg .board-rect{
     transform: scale(1);
   }
 }
+
 @keyframes piece{
   to {
     stroke-dashoffset: 0;
     fill: black;
   }
-  30%{     
+  30%{
     fill: white;}
-
 }
+
 @keyframes swords{
   to {
     stroke-dashoffset: 0;
     fill: lightgray;
   }
-
-
 }
+
 @keyframes swords1{
   to {
     stroke-dashoffset: 0;
     fill:#CC9640;
   }
-
 }
+
 @keyframes swords2{
   to {
     stroke-dashoffset: 0;
     fill:#35231A;
   }
-
 }
+
 @keyframes line{
   to {
     stroke-dashoffset: 0;
@@ -297,6 +337,7 @@ svg .board-rect{
   70%{     
     fill: white;}
 }
+
 @keyframes border{
   to {
     stroke-dashoffset: 0;
@@ -330,6 +371,9 @@ svg .board-rect{
   svg.start-page{
     left: 0vw;
     width: 100vw;
+  }
+  p#final{
+    top: 14vh;
   }
   .container-score{
     height: 12vh;

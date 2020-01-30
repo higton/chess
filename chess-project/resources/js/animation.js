@@ -24,13 +24,11 @@ class Animation{
             setTimeout(function(){
                 lines[0].children[i].classList.remove('animate') }, 3700);
         }
-        debugger
     }
     static showGameTable(){
         const gameTable = document.getElementsByClassName('game-table');
-        gameTable[0].classList.add("animate")
-        setTimeout(function(){
-            gameTable[0].classList.remove("animate") }, 3000);}
+        gameTable[0].style.display = "inline"
+    }
     static showScores(){
         const gameScore = document.getElementsByClassName('game-score');
         gameScore[0].classList.add("animate")
@@ -45,7 +43,7 @@ class Animation{
     static animateUndoButton(undoButton){
         undoButton.classList.add("animate")
         setTimeout(function(){
-            undoButton[0].classList.remove("animate") }, 3000);
+            undoButton.classList.remove("animate") }, 3000)
     }
     static setBoardTableTransition(gameTable, time, i, j){
         gameTable[0].children[i].children[j].style.transition = "all " + time + "s";
@@ -60,6 +58,11 @@ class Animation{
         setTimeout(function(){
             DOM_img.style.transitionDelay = '0s'}, 3000);
       }
+    static setChoicesTransition(items, i, j){
+        items[i].children[j].style.transition = "all 0.5s";
+        setTimeout(function(){
+            items[i].children[j].style.transition = "all 0s"}, 1000);
+    }
     static animateImages(DOM_img, line, column){
         //flushes all pending style changes and forces the layout engine to compute the element's current state, 
         DOM_img.getBoundingClientRect()

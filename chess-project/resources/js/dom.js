@@ -39,8 +39,7 @@ class DOM {
   finishGame(side){
     let paragraph = document.getElementById('final');
     paragraph.textContent = 'Game is Finished, ' + side + ' won';
-    paragraph.style.backgroundColor = 'yellow';
-    paragraph.style.textAlign = "center";
+    paragraph.classList.add("finish")
   }
   //impure
   printChoices(line, column, board) {
@@ -90,7 +89,7 @@ class DOM {
     return false;
   }
   changeBackground(color) {
-    const item = document.getElementsByClassName('container');
+    const item = document.getElementsByClassName('game-table');
     item[0].style.backgroundColor = color;
   }
   updateScore(){
@@ -98,5 +97,19 @@ class DOM {
     paragraph.textContent = board.number_white_pieces_dead
     paragraph = document.getElementById('p2')
     paragraph.textContent = board.number_black_pieces_dead
+  }
+  showKingIsInCheck(){
+    let paragraph = document.getElementById('final')
+    paragraph.textContent = 'King is in check!';
+    paragraph.classList.add("showKingIsInCheck")
+  }
+  hideKingIsInCheckMessage(){
+    let paragraph = document.getElementById('final')
+    paragraph.classList.remove("showKingIsInCheck")
+  }
+  removeFinishMessage(){
+    let paragraph = document.getElementById('final')
+    paragraph.classList.remove("showKingIsInCheck")
+    paragraph.classList.remove("finish")
   }
 }

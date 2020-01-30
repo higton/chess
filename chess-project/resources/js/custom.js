@@ -1,24 +1,19 @@
 // TODO:
 //     Important:
-//     1. make the front-end responsive
-//     2. when the game is won, the background is still red and the score
-//        didnt reset, so its important to reset all the css too
+//     1. Use of functional programming(map, filter)
 
 //     Additional:
 //     1. if clicked again in the piece, will not show the possibilities
 //     2. show the dead pieces on the side
-//     3. Ajust the front-end
-//     4. adjust the red thing when the king is in check, for example
+//     3. adjust the red thing when the king is in check, for example
 //        in pieces that doesnt have choices it will not show the
 //        background red
+//     4. When pawn get to the final line it transforms in a queen
 //     5. save all the movements made in board(maybe mongodb)
 //        undo have to return multiple times and not just 1
-//     6. When pawn get to the final line it transforms in a queen
-//        
+//
 
 //     Refactoring:
-//     refactor the css animation to add or remove
-//     make the function setTimeOut to turn off the animation
 //     create more classes
 //     separate pieces in various files in one folder
 //     reduce side effects on functions
@@ -26,6 +21,8 @@
 //     refactor the functions to be more pure
 //     refactor the class pawn
 //     reduce the number of parameters
+//     addition of class instead of changing styles in javascript
+
 
 let line
 let column
@@ -68,9 +65,13 @@ const insertPieceInPosition = (line, column) => {
 }
 const checkIfGameIsFinished = () => {
   if(board.isKingInCheck()){
+    board.dom.showKingIsInCheck()
     if(board.isGameFinished()){
       board.dom.finishGame(board.turn.other_side)
     }
+  }
+  else{
+    board.dom.hideKingIsInCheckMessage()
   }
 }
 
@@ -110,8 +111,8 @@ const startGame = () => {
 const resetGame = () => {
   removePieces()
   resetScore()
+  removeMessage()
 }
-
 const removePieces = () => {
   for (let i = 0; i <= 7; i++) {
     for (let j = 0; j <= 7; j++) {
@@ -120,8 +121,11 @@ const removePieces = () => {
   }
 }
 const resetScore = () => {
+  board.number_white_pieces_dead = 0;
   board.number_black_pieces_dead = 0;
-  board.number_black_pieces_dead = 0;
+}
+const removeMessage = () => {
+  board.dom.removeFinishMessage()
 }
 
 start.addEventListener('click', buttonClickStartGame);
