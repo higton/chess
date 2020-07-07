@@ -1,2 +1,6 @@
 # Simple-Chess-AI
-Made in pure javascript and just html, css
+
+https://abacaxi.netlify.app/
+
+No libs were used in this project, it was made with just javascript, html and css.
+![](look.gif)
